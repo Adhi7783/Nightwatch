@@ -16,6 +16,10 @@ npm-deepspace.json
 /deploy.mjs
 /.tools/
 /docs/deepspace/
+/production-deploy-state.json
+/test-tools/prepare-socket.mjs
+/nightwatch-preview.jpg
+/verify-live.mjs
 .agents/
 node_modules/
 test-artifacts/

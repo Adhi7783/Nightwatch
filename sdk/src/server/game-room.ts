@@ -201,6 +201,8 @@ export class Board extends RecordRoom<Env> {
         fail(409, 'This request ID was already used for a different action.')
       return Response.json(view(g))
     }
+    g.contributions ??= {}
+    const contribution = (g.contributions[who.id] ??= { evidence: 0, notes: 0, links: 0 })
     if (action === 'start') {
       if (who.id !== g.hostId) fail(403, 'Only the host can start the case.')
       if (g.status !== 'waiting') fail(409, 'The case has already started.')
@@ -217,6 +219,7 @@ export class Board extends RecordRoom<Env> {
         if (!clues.some((c) => c.id === b.id)) fail(400, 'Unknown evidence.')
         if (!g.shared.includes(b.id!)) {
           g.shared.push(b.id!)
+          contribution.evidence++
           g.events.push({
             text: who.name + ' shared ' + clues.find((c) => c.id === b.id)!.title + '.',
             by: who.id,
@@ -254,6 +257,7 @@ export class Board extends RecordRoom<Env> {
           by: who.name,
           at: Date.now(),
         })
+        contribution.links++
         g.events.push({
           text: who.name + ' connected evidence.',
           by: who.id,
@@ -269,6 +273,7 @@ export class Board extends RecordRoom<Env> {
           fail(400, 'Write a note of 1–500 characters.')
         if (g.notes.length >= 100) fail(409, 'The notebook is full.')
         g.notes.push({ id: random(), by: who.name, text: b.text.trim(), at: Date.now() })
+        contribution.notes++
         g.events.push({
           text: who.name + ' added a case note.',
           by: who.id,
@@ -290,6 +295,19 @@ export class Board extends RecordRoom<Env> {
           )
         } catch (e) {
           fail(400, (e as Error).message)
+        }
+        const previousVote = g.votes[who.id]
+        if (
+          previousVote &&
+          'suspect' in previousVote &&
+          sameConclusion(previousVote, theory!) &&
+          previousVote.explanation === theory!.explanation &&
+          [...previousVote.evidence].sort().join(',') === [...theory!.evidence].sort().join(',')
+        ) {
+          fail(
+            409,
+            'Your identical accusation is already recorded. Wait for your partner or revise it.',
+          )
         }
         if (Date.now() - g.lastAttempt < 5000)
           fail(429, 'Review the evidence for a moment before another accusation.')

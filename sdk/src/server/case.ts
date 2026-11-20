@@ -1,6 +1,10 @@
 export const suspects = [
   {
     id: 'mara',
+    motive: 'An external provenance audit threatens the certification she signed.',
+    opportunity: 'Her conservation key opened the display during the 17:40 inspection.',
+    alibi:
+      'Claims she remained in conservation after the toast; the loading camera records her moving a red crate.',
     name: 'Mara Voss',
     role: 'Art restorer',
     initials: 'MV',
@@ -12,6 +16,10 @@ export const suspects = [
   },
   {
     id: 'eli',
+    motive: 'His security contract is up for renewal, and a costly outage could end it.',
+    opportunity: 'Controls the camera restart and alarm console, but has no conservation key.',
+    alibi:
+      'An independent battery-backed desk camera places him at the console throughout the outage.',
     name: 'Eli Ward',
     role: 'Security contractor',
     initials: 'EW',
@@ -23,6 +31,12 @@ export const suspects = [
   },
   {
     id: 'julian',
+    motive:
+      'A shrinking acquisitions budget makes the insured collection financially important to his department.',
+    opportunity:
+      'Can authorize transfers and enter the loading area, but cannot open the sealed display.',
+    alibi:
+      'Corridor footage shows him moving a sealed cradle without opening it, following a signed work order.',
     name: 'Julian Vale',
     role: 'Museum curator',
     initials: 'JV',
@@ -178,6 +192,28 @@ export const motives = [
   { id: 'family', label: 'Reclaim a disputed family gift' },
 ]
 export const reveal = {
+  proof: [
+    {
+      id: 'seal',
+      reason:
+        'The intact seal and gala photograph put a flawed substitute in the display after its last authorized opening.',
+    },
+    {
+      id: 'mold',
+      reason:
+        'The mold reproduces the same crescent flaw. It connects the object in the gala photograph to conservation work.',
+    },
+    {
+      id: 'order',
+      reason:
+        'Mara signed the transfer, and the cradle carried 840 g above its tare weight, accounting for the instrument.',
+    },
+    {
+      id: 'ledger',
+      reason:
+        'The discarded signed assessment and audit warning establish why Mara wanted the instrument unavailable for examination.',
+    },
+  ],
   title: 'The theft happened before the lights went out.',
   culprit: 'Mara Voss',
   summary:

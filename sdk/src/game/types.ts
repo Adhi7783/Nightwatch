@@ -27,6 +27,7 @@ export type Theory = {
 export type Link = { id: string; source: string; target: string; by: string; at: number }
 export type Event = { text: string; at: number; by?: string; kind?: string }
 export type Resolution = {
+  proof: { id: string; reason: string }[]
   title: string
   culprit: string
   summary: string
@@ -58,6 +59,7 @@ export type Game = {
   closedAt?: number
   submissions: { by: string; at: number; theory: Theory; result: string }[]
   receipts: Record<string, string>
+  contributions?: Record<string, { evidence: number; notes: number; links: number }>
 }
 export type PublicGame = Omit<Game, 'shared' | 'receipts'> & {
   shared: Evidence[]
@@ -74,6 +76,9 @@ export type Dossier = {
     color: string
     statement: string
     detail: string
+    motive: string
+    opportunity: string
+    alibi: string
   }[]
   methods: { id: string; label: string }[]
   motives: { id: string; label: string }[]

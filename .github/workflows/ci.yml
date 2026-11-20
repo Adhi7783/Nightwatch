@@ -28,4 +28,5 @@ jobs:
           path: |
             sdk/dist
             sdk/.wrangler/deploy
+            sdk/package-lock.json
           include-hidden-files: true

@@ -140,6 +140,11 @@ export default function Nightwatch() {
       setProfile(null)
       setGame(null)
       setDossier(null)
+      setModal(null)
+      setClue(null)
+      setNote('')
+      setTheory({ suspect: '', method: '', motive: '', evidence: [], explanation: '' })
+      requestRef.current = null
       setLoaded(true)
       return
     }
@@ -760,6 +765,15 @@ export default function Nightwatch() {
                           <h2>{s.name}</h2>
                           <p className="job">{s.role}</p>
                           <p>{s.detail}</p>
+                          <p>
+                            <strong>Possible motive:</strong> {s.motive}
+                          </p>
+                          <p>
+                            <strong>Opportunity:</strong> {s.opportunity}
+                          </p>
+                          <p>
+                            <strong>Alibi:</strong> {s.alibi}
+                          </p>
                           <blockquote>{s.statement}</blockquote>
                         </article>
                       ))}
@@ -884,6 +898,20 @@ export default function Nightwatch() {
                         ))}
                       </div>
                       <div className="section-head">
+                        <h2>Why the evidence fits</h2>
+                      </div>
+                      <section className="panel">
+                        {game.reveal.proof.map((item) => (
+                          <p key={item.id}>
+                            <strong>
+                              {game.shared.find((c) => c.id === item.id)?.title || item.id}
+                            </strong>
+                            <br />
+                            {item.reason}
+                          </p>
+                        ))}
+                      </section>
+                      <div className="section-head">
                         <h2>Reconstructed timeline</h2>
                       </div>
                       {game.reveal.timeline.map(([at, text]) => (
@@ -899,15 +927,18 @@ export default function Nightwatch() {
                         {game.members.map((m) => (
                           <p className="contribution" key={m.id}>
                             <strong>{m.name}</strong> ·{' '}
-                            {
+                            {game.contributions?.[m.id]?.evidence ??
                               game.events.filter((e) => e.by === m.id && e.kind === 'evidence')
-                                .length
-                            }{' '}
+                                .length}{' '}
                             evidence discoveries shared · {game.reviewed[m.id]?.length || 0} clues
                             reviewed ·{' '}
-                            {game.events.filter((e) => e.by === m.id && e.kind === 'link').length}{' '}
+                            {game.contributions?.[m.id]?.links ??
+                              game.events.filter((e) => e.by === m.id && e.kind === 'link')
+                                .length}{' '}
                             connections ·{' '}
-                            {game.events.filter((e) => e.by === m.id && e.kind === 'note').length}{' '}
+                            {game.contributions?.[m.id]?.notes ??
+                              game.events.filter((e) => e.by === m.id && e.kind === 'note')
+                                .length}{' '}
                             notes
                           </p>
                         ))}

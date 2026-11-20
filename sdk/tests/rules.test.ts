@@ -24,6 +24,7 @@ test('one original complete case has three suspects and ten distinct evidence ID
     new Set(['Art restorer', 'Security contractor', 'Museum curator']),
   )
   assert.equal(reveal.timeline.length, 6)
+  assert.equal(reveal.proof.length, 4)
 })
 test('valid supported theory is accepted and matches the deterministic answer', () =>
   assert.equal(matchesSolution(validateTheory(theory, allowed, allowed.evidence), answer), true))
