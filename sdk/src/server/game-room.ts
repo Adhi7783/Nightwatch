@@ -17,7 +17,7 @@ export const gameSchemas: CollectionSchema[] = ['profiles', 'game'].map((name) =
     admin,
   },
 }))
-const fail = (status: number, message: string): never => {
+function fail(status: number, message: string): never {
   throw Object.assign(new Error(message), { status })
 }
 const random = () => crypto.randomUUID().replaceAll('-', '')
