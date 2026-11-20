@@ -1,12 +1,22 @@
-# Nightwatch — SDK revision
+# Nightwatch
 
-> **Submission status:** the initial prototype did not fully meet the detailed brief. The revised React/TypeScript implementation is in `sdk/`. Read [the requirements audit](docs/REQUIREMENTS-AUDIT.md) for implemented items and outstanding verification. The historical prototype notes below are retained for traceability; their 30 live tests do not certify the SDK revision.
+**Live:** https://nightwatch-meridian.app.space  
+**Source:** https://github.com/Adhi7783/Nightwatch
 
-Repository: https://github.com/Adhi7783/Nightwatch
+Nightwatch is an original cooperative detective game built on DeepSpace. One or two signed-in investigators solve **Case 001: The Midnight Museum Heist** by examining ten evidence files, comparing three suspects, saving connections and notes, and submitting a supported accusation. The solution is deterministic and stays in server-only code until the case closes.
 
-The SDK revision implements **The Midnight Museum Heist**: one original case, three suspects (curator, security contractor, art restorer), ten evidence items, one or two authenticated investigators, a host-controlled lobby, shared reviews/importance flags, saved evidence relationships, notes, supported accusations, and a preserved contribution report.
+## Play
 
-## Run the SDK revision
+1. Sign in with GitHub or Google through DeepSpace and choose your detective name.
+2. In Mission Control, create a private room or join using a code/link. Returning accounts can resume their saved rooms.
+3. Invite one partner before starting, or start solo. Only the host can start the investigation.
+4. Inspect four museum locations and share discoveries. Review or mark evidence important, connect it to suspects/other evidence, and record working theories in the shared notebook.
+5. Choose a suspect, method, motive and supporting evidence, then explain the connections. In a two-person case, both investigators submit a matching conclusion with sufficient support.
+6. A correct theory unlocks the full explanation, evidence reasoning, reconstruction and contribution report. Incorrect theories stay spoiler-safe. Both investigators may instead agree to reveal the answer; that records a revealed case rather than a solved case.
+
+Profiles belong to the authenticated DeepSpace account rather than a browser-only identity. Progress is persisted through RecordRoom and synchronized through its live subscription protocol.
+
+## Run locally
 
 Use Node 24 and npm 11.6+.
 
@@ -14,84 +24,59 @@ Use Node 24 and npm 11.6+.
 npm run install:app
 npm test
 npm run type-check
-npm run dev
+cd sdk
+npx deepspace auth login
+npx deepspace auth whoami
+npx deepspace dev start
 ```
 
-For production, work from the `sdk/` directory and authenticate with `npx deepspace auth login`; verify `npx deepspace auth whoami` before registration. The existing `sdk/wrangler.toml` identifies the staging app. **Do not deploy that staging identity under a different account or plane.** The production app must get its own server-minted ID, with the GitHub remote present before its first deployment so GitHub is the source authority. Keep the staging app available until the production important path passes.
+The root scripts delegate app commands to `sdk/`. Its committed `package-lock.json` reproduces the successful CI dependencies; use `npm ci` inside `sdk/` for a clean install.
 
-GitHub Actions installs dependencies, runs the 13 deterministic rule tests, checks TypeScript, and builds. The authenticated multiplayer acceptance specification is in `sdk/tests/acceptance.spec.ts`; it requires actual DeepSpace fixture accounts and has not yet been run here. No credentials are stored in the workflow.
+## Deploy
 
-## Read and explain the revised implementation
+From `sdk/`, use `npx deepspace deploy` under an authorized production developer account. Check `auth whoami` first. Preserve the production app ID `app_01M7VYDJBHE61KDVTRB3DCK6X2`, the BOARD binding, and the v2 room names so saved investigations survive updates.
 
-- `sdk/src/game/types.ts`: typed game/profile/evidence/link/theory records.
-- `sdk/src/game/Nightwatch.tsx`: React screens and controlled forms.
-- `sdk/src/game/rules.ts`: deterministic validation; the browser never decides correctness.
-- `sdk/src/server/case.ts`: original authored case and server-only answer (**spoilers**).
-- `sdk/src/server/nightwatch-routes.ts`: verified platform identity and room routing.
-- `sdk/src/server/game-room.ts`: DeepSpace RecordRoom persistence, membership checks, serialized operations, and duplicate-request receipts.
-- `sdk/src/lib/lookup-own.ts`: small safe lookup/URL helpers absent from the published SDK's exports but referenced by its generated scaffold. These do not replace platform auth or storage.
+The production app's permanent source claim was verified as `github: adhi7783/nightwatch`. Push source to this repository with ordinary Git. Do not use `deepspace push`, which is for DeepSpace-managed source.
 
-The game uses DeepSpace authentication, persistent records, real-time subscriptions, and server permissions. Those are native capabilities, **not three external integrations**. No paid external integration is enabled; AI is never used to judge an answer. Optional AI recap, Canvas, and additional cases remain out of scope.
+Local npm registry connections failed TLS during this build. The official hosted publisher validated the staging SDK candidate, and GitHub Actions installed dependencies, ran TypeScript and rule tests, and built the production artifact. `production-deploy.mjs` then published that artifact using the official CLI's asset-plan/upload/form protocol. Production credentials stayed on the local computer; none were sent to Actions. This transport adaptation is documented rather than claiming that `npx deepspace deploy` ran locally.
 
-## Submission and verification
+The earlier `spacestest.com` prototype is a separate staging app with a permanent DeepSpace source claim. Its config is retained as `sdk/wrangler.staging.toml`. Its legacy browser identities are not silently mapped to native accounts. Never swap staging and production IDs.
 
-- [Requirement-by-requirement audit](docs/REQUIREMENTS-AUDIT.md)
-- [Submission draft and tradeoffs](docs/SUBMISSION.md)
-- [Applicant's personal verification checklist](docs/APPLICANT-VERIFICATION.md)
-- [Interview preparation and investigated bugs](docs/INTERVIEW.md)
+## Main files
 
-Do not claim the applicant personally verified checks performed by an agent. Do not call the staging URL an `.app.space` production release. The deadline is November 23, 2026 at 11:59 PM Eastern / 8:59 PM Pacific.
+- `sdk/src/game/types.ts`: typed profiles, rooms, members, evidence, connections and submissions.
+- `sdk/src/game/Nightwatch.tsx`: React UI, controlled forms, native auth and live snapshots.
+- `sdk/src/game/rules.ts`: small deterministic validation/deduction functions.
+- `sdk/src/server/case.ts`: structured original story and server-only answer. **Contains spoilers.**
+- `sdk/src/server/nightwatch-routes.ts`: verified JWT identity, input boundary and private room routing.
+- `sdk/src/server/game-room.ts`: DeepSpace RecordRoom storage, membership, host start, serialized actions, request deduplication and durable contribution totals.
+- `sdk/src/lib/lookup-own.ts`: safe own-key and URL validation helpers referenced by the generated scaffold but absent from its published SDK exports. Auth, persistence and synchronization remain platform primitives.
+- `verify-sdk-live.mjs`: deployed security/game-flow checks using three real DeepSpace fixture accounts and an independent WebSocket client.
 
----
+## Security and concurrency
 
-## Historical prototype (superseded design)
+Private data is in per-room RecordRooms. Verified platform identity and membership gate every HTTP/socket entry. Client schema writes are denied; server actions validate phase, host authority, IDs, lengths, required evidence and request IDs before writing. A serialized room queue prevents concurrent operations from overwriting each other. Request receipts make retries idempotent and reject a reused ID with different input. Unconfigured paid integration proxies are disabled.
 
-Live game: https://nightwatch-meridian.spacestest.com
+The canonical answer is not imported into browser modules or served as an asset. The source repository includes server code for evaluation; this does not prevent a player deliberately reading repository spoilers. Public file URLs and ordinary gameplay do not disclose the solution before closure.
 
-A complete two-player detective game built on DeepSpace's supported raw JavaScript starter, RecordRoom, schema permissions, and live WebSocket subscriptions. The original case, **The Glass Meridian**, takes place at the fictional Bellwether Museum.
+No credentials, test-account passwords, `.dev.vars`, or session backups belong in Git. Private local files are ignored. The SDK's required `users` schema is retained.
 
-## Play
+## Scope and platform choices
 
-1. Open the live game and choose **Open a private case**.
-2. Create an investigator profile, then copy the invitation link to one partner.
-3. Your partner opens it on a different device, browser, or private browsing session and creates their own profile.
-4. Investigate the four locations. Each investigator receives four different private evidence files. Share them to build the eight-item evidence board.
-5. Compare statements, pin evidence, and use the shared notebook and timeline.
-6. Both investigators submit the same suspect, method, and motive. The server validates the joint accusation. A correct conclusion unlocks the full explanation, recovery, and reconstructed timeline. Both players can alternatively agree to request the reveal after collecting the evidence.
+DeepSpace authentication provides persistent identity; RecordRoom provides records and live updates; schemas and verified server routes enforce permissions. These are native platform capabilities, not three third-party McAPI integrations. No external AI/email/payment integration was added to inflate a count. AI never judges correctness.
 
-Profiles use a server-signed, HttpOnly, Secure, SameSite cookie valid for one year. Returning in the same browser restores the profile and its case archive. Profiles are browser-specific; clearing cookies loses access. The game has no email/password login or cross-device profile recovery. The hosting account backup below manages deployment, not player profiles.
+The main tradeoff is one complete authored case and structured saved connections rather than a draggable canvas or generated mysteries. AI recap/hints, extra cases, cursors, audio and achievements are optional future work.
 
-## Source
+## Verification and submission
 
-- `app/public/`: responsive interface, custom museum instrument illustration, and DeepSpace browser adapter.
-- `app/server.js`: authenticated HTTP API, invitation and membership checks, serialized game operations, server-only accusation validation, and verified room WebSocket routing.
-- `app/model.js`: DeepSpace collection schemas and permissions. Clients can read only the game in their authorized room; game mutations and profile reads/writes require the server.
-- `app/case.js`: hand-authored mystery, private evidence, and complete solution. This file is outside the public asset directory.
-- `app/deepspace-agent.js`: official starter's bundled DeepSpace runtime.
-- `app/wrangler.toml`: official Cloudflare/DeepSpace deployment configuration.
-- `published.json`: latest successful deployment receipt.
-- `verify-live.mjs`: live integration and security verification against independent player sessions.
+GitHub Actions runs the 13 deduction tests, TypeScript validation and production build. Live verification covers native profiles, private rooms, host start, evidence, reviews, pins, links, notes, actual SDK WebSocket broadcasts, input and duplicate-action rejection, incorrect/correct joint accusations, solo completion and preserved reports. See the checked-in verification record for the final counts and CI run.
 
-The preserved starter `worker.js` and `schemas.js` are not the entry point; `wrangler.toml` selects `server.js` and its `model.js` schema.
+Browser checks cover native sign-in, the applicant's saved detective name, room creation/invitation, reload restoration, and the signed-in 390 px layout. The full solve/security path was tested through real HTTP and independent WebSocket sessions. The complete two-browser UI acceptance specification is provided in `sdk/tests/collab.spec.ts`; do not claim it ran unless recorded.
 
-## Installation and publishing
+- [Requirement and original checklist audit](docs/REQUIREMENTS-AUDIT.md)
+- [Verification evidence](docs/VERIFICATION.md)
+- [Submission note](docs/SUBMISSION.md)
+- [Applicant's own remaining playtest checklist](docs/APPLICANT-VERIFICATION.md)
+- [Interview preparation and debugging decisions](docs/INTERVIEW.md)
 
-The requested `npx skills@latest add deepdotspace/deepspace-skill` was attempted first. npm failed with DNS and TLS errors. The official GitHub repository was cloned instead, and its skill entrypoint is installed at `.agents/skills/deepspace/SKILL.md`.
-
-DeepSpace's documented direct publisher builds and hosts this app without local npm dependencies. This deployment uses its **staging service**, which currently publishes to `spacestest.com`. The app has real persistent RecordRoom storage and live sockets; this is not a static demonstration.
-
-The existing application ID is `app_01M7VVHN85TXZEGE37Z4BVGK4V`. Preserve it and the Durable Object room names on updates to retain stored profiles and investigations.
-
-The private hosting recovery receipt is saved locally in `Nightwatch-hosting-backup.private.json`, outside the published app source and ignored by Git. Keep it private: its account phrase controls deployment. The account-management verification expires after 24 hours; hosting, source, and game data continue serving. Renew through DeepSpace's agent account API when needed.
-
-`deploy.mjs` refreshes the existing account token and submits app files. For an update, use `node deploy.mjs update`, then `node deploy.mjs poll` until published. It reads the ignored `.nightwatch-credential.json` file. Never publish that file or the hosting backup. Do not create a second app to update this one.
-
-Authoritative hosting workflow: https://deploy.deepspacesites.com/agents.md
-
-## Verification
-
-30 live checks passed: independent profiles, reload persistence, private-room access, a full two-player room, forged-header and tampered-token rejection, split evidence, role-restricted evidence sharing, actual second-session DeepSpace WebSocket broadcasts, refusal of direct socket writes and cross-origin socket access, notebook and pin persistence, incorrect accusations, two-person confirmation, the complete server-only reveal, immutable closed cases, profile completion, cross-origin mutation refusal, hidden solution source, and the native read-only agent tool.
-
-Browser checks verified the landing page, profile creation, room creation, invitation dialog, live connection status, restoration after reload, and the responsive 390 px phone layout. Visual checks did not play the entire case through the browser; the complete accusation/reveal path was verified through HTTP and a separate real WebSocket client. The live test creates isolated QA profiles and rooms rather than using a player's room.
-
-Detailed live-check results are in `test-artifacts/live-verification.json`. The final interface preview is `nightwatch-preview.jpg`.
+The applicant confirmed production sign-in and detective-name setup. Their full personal partner playthrough and portal submission remain their own steps. The deadline is November 23, 2026, 11:59 PM Eastern / 8:59 PM Pacific.

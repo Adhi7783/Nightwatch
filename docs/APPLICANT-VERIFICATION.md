@@ -1,6 +1,8 @@
 # Applicant verification — not completed by the agent
 
-No personal verification is claimed on your behalf. Complete this yourself before submission.
+You confirmed in chat that you completed production sign-in and saved your detective name; this was also visible in the live Mission Control. The agent does not claim that you completed any other playtest steps below.
+
+- [x] I completed production sign-in and saved my detective name.
 
 - [ ] I signed in with my DeepSpace account, selected my detective name, signed out, and signed back in.
 - [ ] I resumed the same identity and room on another browser/device.

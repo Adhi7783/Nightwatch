@@ -27,6 +27,9 @@
 - WebSocket mutation bypass: sent a direct `core.put` against the original game record; RecordRoom denied it. This check must be repeated on the SDK revision.
 - Scaffold/archive mismatch: current generated routes referenced exports absent from the older prototype archive. Restored the exact package version from the current official scaffold rather than guessing local replacement SDK methods.
 - Failed builds save a new source revision even when the old release stays live. The deployment helper now reads current source revision before submitting an update.
+- TypeScript did not narrow nullable room/member values through an inferred arrow-function failure helper. An explicit `never`-returning function declaration made the boundary clear; the strict CI check then passed.
+- Activity history is intentionally bounded, so deriving report totals from its final 100 entries could lose early contributions. Persistent per-investigator counters now keep complete totals independently of the activity display.
+- Sign-out must clear drafts and open clue state as well as room/profile state. The revised auth boundary clears those transient values to avoid carrying a prior investigator's working text into another session.
 
 ## What the applicant should record
 

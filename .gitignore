@@ -19,6 +19,7 @@ npm-deepspace.json
 /production-deploy-state.json
 /test-tools/prepare-socket.mjs
 /nightwatch-preview.jpg
+/nightwatch-production-preview.jpg
 /verify-live.mjs
 .agents/
 node_modules/

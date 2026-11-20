@@ -51,14 +51,18 @@ try{
  const requestId=crypto.randomUUID(),note={requestId,text:'__test-note: a timeline contradiction.'};await api(a,'note',note,code);await api(a,'note',note,code);check('Retrying identical request does not duplicate notes',(await api(b,'room',undefined,code)).data.notes.length===1);
  check('Reusing request ID with different input is refused',(await api(a,'note',{requestId,text:'changed'},code)).status===409);
  check('Nonmember cannot add private note',(await api(c,'note',{text:'intrusion'},code)).status===403);
+ await Promise.all([api(a,'note',{text:'__test-concurrent-host'},code),api(b,'note',{text:'__test-concurrent-partner'},code)]);
+ check('Concurrent investigator writes preserve both notes',(await api(a,'room',undefined,code)).data.notes.length===3);
  const right={suspect:'mara',method:'swap',motive:'audit',evidence:['seal','mold','order','ledger'],explanation:'The authorized inspection, replica mold, shipping weight and audit motive explain the sequence.'};
  check('Unknown supporting evidence is rejected',(await api(a,'accuse',{...right,evidence:['fake']},code)).status===400);
  check('Duplicate supporting evidence is rejected',(await api(a,'accuse',{...right,evidence:['seal','seal']},code)).status===400);
  const wrong={...right,suspect:'eli',method:'override',motive:'debt'};await api(a,'accuse',wrong,code);const incorrect=await api(b,'accuse',wrong,code);check('Incorrect joint accusation is spoiler-safe',incorrect.data.status==='investigating'&&!incorrect.data.reveal&&incorrect.data.feedback&&!incorrect.data.feedback.includes('Mara'));
  await new Promise(r=>setTimeout(r,5100));
  check('One correct vote cannot close a two-investigator case',(await api(a,'accuse',right,code)).data.status==='investigating');
+ check('Duplicate pending accusation is rejected without adding another submission',(await api(a,'accuse',right,code)).status===409);
  const solved=await api(b,'accuse',right,code);check('Supported matching accusations unlock the full reveal',solved.data.status==='closed'&&solved.data.reveal.timeline.length===6);
  check('Final report preserves investigator contributions and submissions',solved.data.members.length===2&&solved.data.submissions.length===4&&solved.data.events.some(e=>e.kind==='link'));
+ check('Final report explains required evidence and preserves durable contribution totals',solved.data.reveal.proof.length===4&&solved.data.contributions[ap.data.profile.id].notes===2&&solved.data.contributions[bp.data.profile.id].notes===1);
  check('Closed case history survives a fresh request',(await api(a,'room',undefined,code)).data.reveal.culprit==='Mara Voss');
  check('Solved case cannot be modified',(await api(a,'note',{text:'after closure'},code)).status===409);
  check('Account case history records completion',(await api(a,'profile')).data.profile.closed.includes(code));

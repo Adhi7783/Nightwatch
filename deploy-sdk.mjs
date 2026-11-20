@@ -11,6 +11,8 @@ if(process.argv[2]==='poll'){
  const prior=JSON.parse(await fs.readFile('published.json','utf8'));const files={};
  async function walk(dir){for(const item of await fs.readdir(dir,{withFileTypes:true})){if(['node_modules','.git','dist','.agents'].includes(item.name))continue;const file=path.join(dir,item.name);if(item.isDirectory())await walk(file);else files[path.relative('sdk',file).replaceAll('\\','/')]=await fs.readFile(file,'utf8');}}
  await walk('sdk');
+ // The local default config targets production. Staging keeps its own identity.
+ files['wrangler.toml']=await fs.readFile('sdk/wrangler.staging.toml','utf8');
  const source=await request('/api/publish/apps/'+prior.appId+'/source?summary=1');
  const result=await request('/api/publish',{appId:prior.appId,name:prior.name,expectedRevision:source.revision,idempotencyKey:crypto.randomUUID(),files});await fs.writeFile('sdk-job.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
 }
