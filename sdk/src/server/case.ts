@@ -4,7 +4,7 @@ export const suspects = [
     motive: 'An external provenance audit threatens the certification she signed.',
     opportunity: 'Her conservation key opened the display during the 17:40 inspection.',
     alibi:
-      'Claims she remained in conservation after the toast; the loading camera records her moving a red crate.',
+      'Says she remained in the conservation studio after the toast. Check the independent movement records before accepting this claim.',
     name: 'Mara Voss',
     role: 'Art restorer',
     initials: 'MV',
@@ -19,7 +19,7 @@ export const suspects = [
     motive: 'His security contract is up for renewal, and a costly outage could end it.',
     opportunity: 'Controls the camera restart and alarm console, but has no conservation key.',
     alibi:
-      'An independent battery-backed desk camera places him at the console throughout the outage.',
+      'Says he stayed at the security console throughout the outage and offers the separate desk camera as corroboration.',
     name: 'Eli Ward',
     role: 'Security contractor',
     initials: 'EW',
@@ -36,7 +36,7 @@ export const suspects = [
     opportunity:
       'Can authorize transfers and enter the loading area, but cannot open the sealed display.',
     alibi:
-      'Corridor footage shows him moving a sealed cradle without opening it, following a signed work order.',
+      'Says he moved a sealed cradle without opening it, following a signed work order. The corridor footage and shipping records can test that account.',
     name: 'Julian Vale',
     role: 'Museum curator',
     initials: 'JV',

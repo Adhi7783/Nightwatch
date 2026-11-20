@@ -30,6 +30,7 @@
 - TypeScript did not narrow nullable room/member values through an inferred arrow-function failure helper. An explicit `never`-returning function declaration made the boundary clear; the strict CI check then passed.
 - Activity history is intentionally bounded, so deriving report totals from its final 100 entries could lose early contributions. Persistent per-investigator counters now keep complete totals independently of the activity display.
 - Sign-out must clear drafts and open clue state as well as room/profile state. The revised auth boundary clears those transient values to avoid carrying a prior investigator's working text into another session.
+- Suspect dossiers should present alibis as claims to investigate, not summarize corroborating footage before a player opens that evidence. Their copy was revised to keep the investigation spoiler-safe while preserving the underlying case logic.
 
 ## What the applicant should record
 
