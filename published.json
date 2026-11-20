@@ -1,0 +1,17 @@
+{
+  "id": "c6a2f3ff-b168-4f83-8b88-5193b2613369",
+  "name": "nightwatch-meridian",
+  "status": "published",
+  "createdAt": 1795160185675,
+  "startedAt": 1795160186015,
+  "finishedAt": 1795160287442,
+  "revision": "9b40ca58be14af0d293c799a891c2117c6a45ab5",
+  "releaseId": "rel_01M7VY8A366ABK2GKF6AS1VA37",
+  "url": "https://nightwatch-meridian.spacestest.com",
+  "appId": "app_01M7VVHN85TXZEGE37Z4BVGK4V",
+  "done": true,
+  "elapsedMs": 101767,
+  "queueMs": 340,
+  "statusUrl": "/api/publish/jobs/c6a2f3ff-b168-4f83-8b88-5193b2613369",
+  "pollAfterMs": 0
+}

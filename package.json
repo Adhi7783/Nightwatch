@@ -1,0 +1,11 @@
+{
+  "name": "nightwatch-workspace",
+  "private": true,
+  "scripts": {
+    "install:app": "npm --prefix sdk install",
+    "dev": "npm --prefix sdk run dev",
+    "build": "npm --prefix sdk run build",
+    "test": "node --experimental-strip-types --test sdk/tests/rules.test.ts",
+    "type-check": "npm --prefix sdk run type-check"
+  }
+}
