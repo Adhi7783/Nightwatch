@@ -68,5 +68,14 @@ try{
  check('Account case history records completion',(await api(a,'profile')).data.profile.closed.includes(code));
  const solo=(await api(a,'create',{})).data.code;await api(a,'start',{},solo);for(const id of right.evidence)await api(a,'share',{id},solo);check('One investigator can solve a solo case',(await api(a,'accuse',right,solo)).data.status==='closed');
  check('Worker solution is unavailable as a public asset',(await fetch(base+'/src/server/case.ts')).status===404);
+ const beforeSignOut=(await api(c,'profile')).data.profile;
+ const signedOut=await fetch(auth+'/api/auth/sign-out',{method:'POST',headers:{Cookie:c.cookie,Origin:auth,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
+ const cleared=await fetch(auth+'/api/auth/get-session',{headers:{Cookie:c.cookie,Origin:auth},signal:AbortSignal.timeout(15000)});
+ const oldSession=await cleared.json();
+ const signedIn=await fetch(auth+'/api/auth/sign-in/email',{method:'POST',headers:{Origin:auth,'Content-Type':'application/json'},body:JSON.stringify({email:c.email,password:c.password}),redirect:'manual',signal:AbortSignal.timeout(15000)});
+ c.cookie=signedIn.headers.get('set-cookie')?.match(/__Secure-better-auth\.session_token=([^;]+)/)?.[0];
+ const newToken=await fetch(auth+'/api/auth/token',{method:'POST',headers:{Cookie:c.cookie,Origin:auth},signal:AbortSignal.timeout(15000)});c.jwt=(await newToken.json()).token;c.jwtSaved=Date.now();
+ check('Native sign-out clears the session and sign-in restores the same detective profile',signedOut.ok&&oldSession===null&&signedIn.ok&&(await api(c,'profile')).data.profile.id===beforeSignOut.id);
+ await fs.writeFile('.test-users.private.json',JSON.stringify(users));
  await fs.mkdir('test-artifacts',{recursive:true});await fs.writeFile('test-artifacts/sdk-live-verification.json',JSON.stringify({url:base,checkedAt:new Date().toISOString(),checks},null,2));console.log('All '+checks.length+' SDK live checks passed.');
 }finally{socket?.close()}

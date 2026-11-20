@@ -2,9 +2,9 @@
 
 Production: https://nightwatch-meridian.app.space  
 Repository: https://github.com/Adhi7783/Nightwatch  
-Runtime source commit: `5358517a5671e0dcc3b696800642c68025b09292`  
-Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/44697986141  
-Production release: `rel_01M7VZ4XCHXTGC0WJ2RCTZHX23`
+Runtime source commit: `f3e002a2e8d2fde47caca434bfda20bee0a9f6b9`  
+Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/44699104780  
+Production release: `rel_01M7VZNAWGGDWH3WFEQ1SH5GRJ`
 
 GitHub Actions installed the exact SDK dependencies, ran 13 deterministic tests, passed strict TypeScript validation and built the production Worker/web assets. The resulting package lockfile is committed for reproducibility. The final production source claim was read back from DeepSpace and reported `github: adhi7783/nightwatch`, revision 1.
 
@@ -12,7 +12,7 @@ GitHub Actions installed the exact SDK dependencies, ran 13 deterministic tests,
 
 **13 local and CI deduction tests:** case structure and unique IDs; valid supported solution; missing required support; wrong suspect; unknown suspect; unshared/unknown/duplicate/empty/non-array evidence; explanation boundaries; matching and mismatched joint conclusions; and complete canonical evidence references.
 
-**41 production checks using three real native-auth fixture accounts:**
+**42 production checks using three real native-auth fixture accounts:**
 
 - Native platform-JWT profiles persisted across requests; unsigned identity was refused.
 - Room creation entered the lobby, the partner joined, a third investigator was refused, and only the host could start.
@@ -30,6 +30,7 @@ GitHub Actions installed the exact SDK dependencies, ran 13 deterministic tests,
 - Contribution counters and submission history were preserved. Closed rooms rejected later mutations and remained readable.
 - Completed cases appeared in account history, and a solo investigator could independently finish a case.
 - The server solution file was not accessible as a public asset.
+- Native sign-out cleared the fixture session; signing back in restored the same detective profile.
 
 The executable regression is `verify-sdk-live.mjs`; local JSON results are in ignored `test-artifacts/sdk-live-verification.json`. Test account credentials are private and are not committed.
 
@@ -37,7 +38,9 @@ The executable regression is `verify-sdk-live.mjs`; local JSON results are in ig
 
 The applicant completed the production account OAuth login, then signed into the production game and selected a detective name. Their saved identity was visible in Mission Control and restored after reload.
 
-The agent checked signed-in Mission Control, room creation, the private invitation dialog, host status and lobby restoration. The 390 px layout rendered without horizontal page overflow. The native modal provided focus trapping and close behavior. Desktop and mobile screenshots were inspected. The user room remains in its lobby with a free partner seat; no solution was revealed in that room.
+The agent checked signed-in Mission Control, room creation, the private invitation dialog, host status and lobby restoration. The 390 px layout rendered without horizontal page overflow, and the 1280 px desktop layout was inspected. The native modal provided focus trapping; the deployed Escape/focus-restoration correction was verified by observing focus return to its triggering profile button. The final provisional alibi copy was read in the deployed dossier. Desktop and mobile screenshots were inspected. The user room remains in its lobby with a free partner seat; no solution was revealed in that room.
+
+The 42-check production engine regression passed before the last editorial alibi and dialog-focus update. That update did not change server game rules or permissions; it passed the full locked-dependency CI build and was checked in the live browser afterward. The CI/source/release references above identify that final deployed update.
 
 The original DOCX project checklist was read and cross-checked for core, optional, test, source-control and submission requirements. Its checkboxes were not edited.
 
