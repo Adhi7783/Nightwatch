@@ -86,7 +86,7 @@ export const clues = [
     title: 'The unbroken seal',
     kind: 'SCENE REPORT',
     time: '22:20',
-    body: 'The display’s numbered security seal is intact. Its weekly opening was logged at 17:40, supervised by Mara Voss. A sharp photograph from the 21:30 gala toast shows a tiny crescent scratch on the Meridian’s lower ring. The authentic object’s condition report records no such scratch.',
+    body: 'The display’s numbered security seal is intact. Its weekly opening was logged at 17:40, supervised by Mara Voss. A sharp photograph from the 21:30 gala toast shows a tiny crescent scratch on the Meridian’s lower ring. The museum’s catalogued instrument has no such scratch in its condition report.',
     inference: 'The object seen during the gala may already have been a substitute.',
   },
   {
@@ -116,7 +116,7 @@ export const clues = [
     title: 'An authorized opening',
     kind: 'ACCESS LOG',
     time: '17:40',
-    body: 'The display was opened at 17:40 with conservation key CV-02, assigned to Mara Voss. No display opening occurred afterward. Eli’s override card was not used. At 22:17 the load sensor changed from 840 g to 0 g without the lock opening; the alarm followed. A timed lifting cradle can be operated from beneath the plinth.',
+    body: 'The display was opened at 17:40 with conservation key CV-02, assigned to Mara Voss. No opening occurred afterward. Eli’s override card was not used. At 22:17 the display load sensor changed from 840 g to 0 g; the alarm followed. A conservation lift can lower a display object into a felt-lined catch compartment inside the plinth without opening the sealed front door. Its setup hatch requires the same conservation key.',
     inference: 'The alarm marks the decoy’s removal, not necessarily the original’s theft.',
   },
   {
@@ -126,7 +126,7 @@ export const clues = [
     title: 'A familiar imperfection',
     kind: 'BENCH EXAMINATION',
     time: '22:31',
-    body: 'A fresh silicone mold matches the Meridian. A crescent-shaped nick in its lower ring matches the gala photograph exactly. A small timed lifting cradle is missing from the studio’s equipment rack. Mara’s 17:40 checklist says “humidity inspection”; replicas are not authorized for that procedure.',
+    body: 'A fresh silicone mold matches the Meridian. A crescent-shaped nick in its lower ring matches the gala photograph exactly. Casting notes describe a resin decoy weighted to 840 g, separate from the museum’s catalogued instrument. A timed conservation lift is missing from the rack. Mara’s 17:40 checklist says “humidity inspection”; replicas are not authorized for that procedure.',
     inference: 'The substitute and its removal mechanism came from conservation.',
   },
   {
@@ -136,7 +136,7 @@ export const clues = [
     title: 'The missing provenance page',
     kind: 'DOCUMENT RECOVERY',
     time: '22:34',
-    body: 'A page recovered from Mara’s shred bin is a signed 2021 provenance assessment. It identifies the Meridian as a later reproduction. A note from the museum’s director reads: “External audit opens Monday. Your certification will be reviewed first.” The reverse has a handwritten inventory code: R-19.',
+    body: 'A technical assessment recovered from Mara’s shred bin identifies the museum’s catalogued Meridian as a twentieth-century reproduction. Her accompanying 2021 certification nevertheless declares it an antique. This older reproduction is distinct from the fresh gala decoy. The director’s note reads: “External audit opens Monday. Your certification will be reviewed first.” The reverse bears inventory code R-19.',
     inference: 'An audit threatens the reputation of the person who certified the object.',
   },
   {
@@ -166,7 +166,7 @@ export const clues = [
     title: 'The delayed trigger',
     kind: 'EQUIPMENT MANUAL',
     time: '22:40',
-    body: 'The missing lifting cradle fits beneath the gallery plinth and supports a programmed release. Its bench-test log records an 840 g replica load and a 22:17 release, saved during the 17:40 inspection. Mara signed the equipment checkout.',
+    body: 'The missing conservation lift fits inside the gallery plinth. A programmed release lowers its support below the display load sensor into a felt-lined catch compartment, leaving the front seal intact. The setup hatch was locked at 17:40. The bench-test log records an 840 g decoy and a 22:17 release, programmed during that inspection. Mara signed the equipment checkout.',
     inference: 'A delayed mechanism could create an alarm long after the original was removed.',
   },
   {
@@ -217,20 +217,20 @@ export const reveal = {
   title: 'The theft happened before the lights went out.',
   culprit: 'Mara Voss',
   summary:
-    'Mara replaced the Meridian with a silicone-cast replica during her authorized 17:40 inspection. The crescent flaw in her mold appears on the gala photograph, while the unbroken seal and access log rule out a later opening.',
+    'Mara removed the museum’s catalogued Meridian during her authorized 17:40 inspection and installed a newly cast resin decoy, weighted to the same 840 g. The crescent flaw from her silicone mold appears on the decoy in the gala photograph. She sealed the front door and the conservation setup hatch before the guests arrived.',
   method:
-    'A timed cradle removed the replica from beneath the plinth at 22:17, turning an earlier swap into an apparent late-night heist. Eli’s camera restart was a useful distraction, not the means of entry. Julian unknowingly moved the original inside sealed cradle R-19.',
+    'At 22:17 the programmed conservation lift lowered the decoy off the display load sensor into the felt-lined compartment inside the plinth. The sensor fell to zero and triggered the alarm, with the front seal untouched. Nobody carried the decoy away. Eli’s unrelated camera restart created a misleading coincidence. Julian unknowingly moved the catalogued instrument inside sealed cradle R-19.',
   motive:
-    'The external audit would expose Mara’s signed, false provenance certification. Staging a theft would take the object out of circulation before it could be examined. She intended to retrieve it after the investigation moved elsewhere.',
+    'The museum’s exhibited instrument was itself an older reproduction that Mara had falsely certified as an antique in 2021. It was not the new gala decoy. The external audit would expose that fraud. Staging its disappearance would prevent examination, and the scheduled transfer would move it offsite before the audit. Mara intended to retrieve it from storage later.',
   recovery:
-    'Cradle R-19 is secured in the museum’s bonded-storage cage. Its 840 g excess weight accounts for the missing Meridian. Investigators recover it before the 06:00 collection.',
+    'Investigators secure cradle R-19 in the museum’s bonded-storage cage before its 06:00 collection and recover the catalogued Meridian. Its 840 g weight accounts for the cradle’s excess over tare. Staff unlock the plinth’s conservation hatch and recover the newly made decoy from the catch compartment, completing the reconstruction.',
   timeline: [
     ['17:40', 'Mara opens the case and substitutes her replica.'],
     ['21:30', 'The replica’s crescent flaw is captured in a gala photograph.'],
     ['21:55', 'Mara signs the misleading transfer order for R-19.'],
     ['22:09', 'Eli restarts camera seven; his desk camera confirms his location.'],
     ['22:14', 'Julian moves the sealed cradle containing the original.'],
-    ['22:17', 'The timed cradle removes the replica; the load alarm sounds.'],
+    ['22:17', 'The lift lowers the decoy into the plinth compartment; the load alarm sounds.'],
   ],
   exonerated:
     'Eli’s independent desk footage corroborates his alibi. Julian moved a sealed crate under Mara’s signed order and had himself requested the audit. His belief that the crate was empty was mistaken, but the footage and paperwork account for his actions.',

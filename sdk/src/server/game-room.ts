@@ -118,11 +118,47 @@ export class Board extends RecordRoom<Env> {
       }
       if (b.room && !p.rooms.includes(b.room)) p.rooms = [b.room, ...p.rooms].slice(0, 30)
       if (b.award && !p.closed.includes(b.award)) p.closed.push(b.award)
+      if (b.briefingSeen === true) p.briefingSeen = true
       await this.put('profiles', p.id, p)
       return Response.json({ profile: p })
     }
     const who = b.who
     if (!who.name) fail(409, 'Choose your detective name first.')
+    // These internal operations are reached only through the authenticated,
+    // curated feature routes. RecordRoom serializes reservations across workers.
+    if (action === 'service-reserve') {
+      const key = String(b.key)
+      const cached = await this.get<{ value?: unknown; until: number; lease?: string }>(
+        'profiles',
+        'cache:' + key,
+      )
+      if (cached?.value && cached.until > Date.now()) return Response.json({ value: cached.value })
+      if (cached && cached.until > Date.now())
+        fail(429, 'This request is already processing. Please retry in a moment.')
+      const day = new Date().toISOString().slice(0, 10)
+      for (const [id, limit] of [
+        ['budget:' + day, 60],
+        ['budget:' + day + ':' + who.id, 10],
+      ] as const) {
+        const budget = (await this.get<{ count: number }>('profiles', id)) || { count: 0 }
+        if (budget.count >= limit)
+          fail(429, 'The daily assistant limit has been reached. Investigation remains available.')
+      }
+      for (const id of ['budget:' + day, 'budget:' + day + ':' + who.id]) {
+        const budget = (await this.get<{ count: number }>('profiles', id)) || { count: 0 }
+        await this.put('profiles', id, { count: budget.count + 1 })
+      }
+      const lease = random()
+      await this.put('profiles', 'cache:' + key, { until: Date.now() + 120000, lease })
+      return Response.json({ lease })
+    }
+    if (action === 'service-save') {
+      const id = 'cache:' + String(b.key)
+      const cached = await this.get<{ lease?: string }>('profiles', id)
+      if (cached?.lease !== b.lease) fail(409, 'This assistant request has expired. Retry it.')
+      await this.put('profiles', id, { value: b.value, until: Date.now() + Number(b.ttl) })
+      return Response.json({ saved: true })
+    }
     let g = await this.get<Game>('game', 'case')
     if (action === 'create') {
       if (g) fail(409, 'Room already exists.')

@@ -16,6 +16,7 @@ export type Profile = {
   rooms: string[]
   closed: string[]
   created: number
+  briefingSeen?: boolean
 }
 export type Theory = {
   suspect: string

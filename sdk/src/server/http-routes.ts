@@ -231,6 +231,8 @@ export function registerAuthAndIntegrationRoutes(app: Hono<AppContext>): void {
 
   app.all('/api/integrations/:name/:endpoint', async (c) => {
     const integrationName = c.req.param('name')
+    if (['anthropic', 'elevenlabs', 'cloudconvert'].includes(integrationName))
+      return c.json({ error: 'Use the authenticated Nightwatch feature routes.' }, 403)
     // Params arrive decoded, so `..%2F..%2Fapi%2Fusers` would otherwise
     // reach another api-worker route with the owner's token. Plain
     // identifiers only, and own keys only for the config.

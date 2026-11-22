@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { AuthOverlay, useAuth, getAuthToken, signOut } from 'deepspace'
 import type { Profile, PublicGame, Dossier, Evidence, Theory } from './types'
+import { Machinery, Briefing, type Speech } from './CommandVisuals'
 
 type Page =
   | 'mission'
@@ -40,7 +41,7 @@ async function api<T>(
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body ? JSON.stringify({ ...body, code }) : undefined,
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(['briefing', 'recap', 'report'].includes(action) ? 100000 : 15000),
   })
   const data = (await response.json()) as T & { error?: string }
   if (!response.ok)
@@ -51,10 +52,12 @@ function Modal({
   title,
   onClose,
   children,
+  dismissible = true,
 }: {
   title: string
   onClose: () => void
   children: ReactNode
+  dismissible?: boolean
 }) {
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
@@ -67,18 +70,34 @@ function Modal({
     }
   }, [])
   return (
-    <dialog ref={ref} className="modal" aria-label={title} onCancel={onClose}>
-      <button className="close" aria-label="Close dialog" onClick={onClose}>
-        ×
-      </button>
+    <dialog
+      ref={ref}
+      className="modal"
+      aria-label={title}
+      onCancel={(e) => {
+        if (!dismissible) e.preventDefault()
+        else onClose()
+      }}
+    >
+      {dismissible && (
+        <button className="close" aria-label="Close dialog" onClick={onClose}>
+          ×
+        </button>
+      )}
       <h2>{title}</h2>
       {children}
     </dialog>
   )
 }
-function Brand({ onClick }: { onClick?: () => void }) {
+function Brand({ onClick, expanded }: { onClick?: () => void; expanded?: boolean }) {
   return (
-    <button className="brand text-btn" onClick={onClick}>
+    <button
+      className="brand text-btn"
+      onClick={onClick}
+      aria-label="Nightwatch Forensic Command"
+      aria-expanded={expanded}
+      aria-controls={onClick ? 'command-navigation' : undefined}
+    >
       <span className="brandmark">N</span>
       <span>
         NIGHTWATCH<small>FORENSIC COMMAND</small>
@@ -125,6 +144,19 @@ export default function Nightwatch() {
   const activeCode = game?.code
   const requestRef = useRef<{ body: string; id: string } | null>(null)
   const generation = useRef(0)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [recap, setRecap] = useState<{
+    observations: { evidenceId: string; quote: string }[]
+    evidenceCount: number
+  } | null>(null)
+  const [reportUrl, setReportUrl] = useState('')
+  useEffect(() => {
+    const close = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', close)
+    return () => window.removeEventListener('keydown', close)
+  }, [])
 
   async function openRoom(code: string, join = false) {
     setError('')
@@ -133,6 +165,9 @@ export default function Nightwatch() {
     setGame(g)
     setDossier(d)
     setPage('overview')
+    setRecap(null)
+    setReportUrl('')
+    setMenuOpen(false)
     setModal(null)
     localStorage.setItem('nightwatch-sdk-room', code)
     setProfile((await api<{ profile: Profile }>('profile')).profile)
@@ -162,10 +197,7 @@ export default function Nightwatch() {
         if (invitation) {
           setJoinCode(invitation)
           setModal('join')
-        } else {
-          const saved = localStorage.getItem('nightwatch-sdk-room')
-          if (saved && p.rooms.includes(saved)) await openRoom(saved)
-        }
+        } else setPage('mission')
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoaded(true))
@@ -275,6 +307,7 @@ export default function Nightwatch() {
     return g
   }
   function mission() {
+    setMenuOpen(false)
     setPage('mission')
     setGame(null)
     setDossier(null)
@@ -305,6 +338,8 @@ export default function Nightwatch() {
     return (
       <>
         <link rel="stylesheet" href="/nightwatch.css" />
+        <link rel="stylesheet" href="/command.css" />
+        <Machinery />
         <header className="lobby-header">
           <Brand />
           <span className="eyebrow">A CASE FOR TWO</span>
@@ -336,58 +371,91 @@ export default function Nightwatch() {
         </main>
       </>
     )
+  if (profile?.name && game && !profile.briefingSeen)
+    return (
+      <>
+        <link rel="stylesheet" href="/nightwatch.css" />
+        <link rel="stylesheet" href="/command.css" />
+        <Briefing
+          load={() => api<Speech>('briefing', {})}
+          complete={async () => {
+            const p = await api<{ profile: Profile }>('briefing-seen', {})
+            setProfile(p.profile)
+          }}
+        />
+      </>
+    )
   return (
     <>
       <link rel="stylesheet" href="/nightwatch.css" />
+      <link rel="stylesheet" href="/command.css" />
+      {(!profile?.name || game?.status === 'waiting') && <Machinery />}
+      <header className="command-header">
+        <span className="header-system">
+          N/W OS <i /> SECURE
+        </span>
+        <Brand onClick={() => setMenuOpen((v) => !v)} expanded={menuOpen} />
+        <div className="header-account">
+          <button
+            className="text-btn detective-name"
+            onClick={() => {
+              setName(profile?.name || '')
+              setModal('profile')
+            }}
+          >
+            {profile?.name || 'IDENTITY PENDING'}
+          </button>
+          <button
+            className="text-btn sign-out"
+            disabled={busy}
+            onClick={() =>
+              void perform(async () => {
+                await signOut()
+                mission()
+              })
+            }
+          >
+            Sign out
+          </button>
+        </div>
+      </header>
+      {menuOpen && (
+        <button
+          className="nav-shade"
+          aria-label="Close navigation"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
       <div className="shell">
-        <aside className="rail">
-          <Brand onClick={mission} />
-          <div className="rail-label">INVESTIGATION TERMINAL</div>
-          <nav className="nav" aria-label="Nightwatch">
-            {(Object.keys(titles) as Page[])
-              .filter((p) => p === 'mission' || game)
-              .map((p) => (
-                <button
-                  key={p}
-                  className={page === p ? 'active' : ''}
-                  aria-current={page === p ? 'page' : undefined}
-                  onClick={() => (p === 'mission' ? mission() : setPage(p))}
-                >
-                  {titles[p]}
-                </button>
-              ))}
-          </nav>
-          <div className="rail-bottom">
-            <button
-              className="text-btn"
-              onClick={() => {
-                setName(profile?.name || '')
-                setModal('profile')
-              }}
-            >
-              {profile?.name || 'Choose detective name'}
-              {self && (
-                <small className="muted">
-                  {' '}
-                  · {game?.hostId === profile?.id ? 'Host' : 'Partner'}
-                </small>
-              )}
-            </button>
-            <br />
-            <button
-              className="text-btn"
-              onClick={() =>
-                void perform(async () => {
-                  await signOut()
-                  mission()
-                })
-              }
-            >
-              Sign out
-            </button>
-            <p className="powered">BUILT ON DEEPSPACE</p>
-          </div>
-        </aside>
+        {menuOpen && (
+          <aside className="rail" id="command-navigation">
+            <div className="rail-label">COMMAND DIRECTORY</div>
+            <nav className="nav" aria-label="Nightwatch">
+              {(Object.keys(titles) as Page[])
+                .filter((p) => p === 'mission' || (game && game.status !== 'waiting'))
+                .map((p, i) => (
+                  <button
+                    key={p}
+                    className={page === p ? 'active' : ''}
+                    aria-current={page === p ? 'page' : undefined}
+                    onClick={() => {
+                      if (p === 'mission') mission()
+                      else setPage(p)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <span className="nav-index">0{i + 1}</span>
+                    {titles[p]}
+                  </button>
+                ))}
+            </nav>
+            <p className="directory-hint">
+              SELECT A DESTINATION
+              <br />
+              ESC TO CLOSE
+            </p>
+          </aside>
+        )}
         <div>
           <header className="topbar">
             <span className="eyebrow">{titles[page]}</span>
@@ -416,33 +484,37 @@ export default function Nightwatch() {
             )}
             {busy && <p role="status">Saving…</p>}
             {!profile?.name ? (
-              <section className="panel">
-                <Heading title="Choose your detective identity." />
-                <form
-                  onSubmit={(e) =>
-                    submit(e, async () => {
-                      const p = await api<{ profile: Profile }>('profile', { name })
-                      setProfile(p.profile)
-                    })
-                  }
-                >
-                  <label htmlFor="first-name">Detective name</label>
-                  <input
-                    className="input"
-                    id="first-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    minLength={2}
-                    maxLength={24}
-                    required
-                  />
-                  <div className="modal-actions">
-                    <button className="btn" disabled={busy}>
-                      Save detective identity
-                    </button>
-                  </div>
-                </form>
-              </section>
+              <div className="identity-scene">
+                <Modal title="Establish your identity." dismissible={false} onClose={() => {}}>
+                  <p className="identity-intro">
+                    Your clearance begins with a name. Choose how your partner will know you.
+                  </p>
+                  <form
+                    onSubmit={(e) =>
+                      submit(e, async () => {
+                        const p = await api<{ profile: Profile }>('profile', { name })
+                        setProfile(p.profile)
+                      })
+                    }
+                  >
+                    <label htmlFor="first-name">Detective name</label>
+                    <input
+                      className="input"
+                      id="first-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      minLength={2}
+                      maxLength={24}
+                      required
+                    />
+                    <div className="modal-actions">
+                      <button className="btn" disabled={busy}>
+                        Save detective identity
+                      </button>
+                    </div>
+                  </form>
+                </Modal>
+              </div>
             ) : page === 'mission' ? (
               <>
                 <Heading title="Mission Control.">
@@ -457,7 +529,7 @@ export default function Nightwatch() {
                       <em>Museum Heist.</em>
                     </h2>
                     <p>
-                      The Glass Meridian disappears during a museum security outage. The display
+                      An alarm. An empty display. The Glass Meridian is missing, yet the display
                       seal is still intact. Investigate the timing, identify the culprit, and
                       recover the instrument.
                     </p>
@@ -470,7 +542,6 @@ export default function Nightwatch() {
                           void perform(async () => {
                             const g = await api<PublicGame>('create', {})
                             await openRoom(g.code)
-                            setModal('invite')
                           })
                         }
                       >
@@ -518,30 +589,53 @@ export default function Nightwatch() {
                   <>
                     <Heading title={game.title}>
                       {game.status === 'waiting'
-                        ? 'Lobby — the host chooses when to begin.'
+                        ? 'Lobby .  the host chooses when to begin.'
                         : game.status === 'closed'
                           ? 'Completed investigation. Your history is preserved.'
                           : 'Inspect, compare, and connect the evidence.'}
                     </Heading>
-                    <section className="panel">
+                    <section className={game.status === 'waiting' ? 'case-lobby' : 'panel'}>
                       <span className="eyebrow">CASE BRIEF</span>
                       <p>{dossier.brief}</p>
-                      <div className="actions-row">
-                        {game.status === 'waiting' && game.hostId === profile.id && (
+                      <div className={game.status === 'waiting' ? 'lobby-orbits' : 'actions-row'}>
+                        {game.status === 'waiting' && (
                           <button
-                            className="btn"
-                            disabled={busy}
+                            className="btn orbit-button"
+                            disabled={busy || game.hostId !== profile.id}
                             onClick={() =>
                               void perform(async () => {
                                 await mutate('start')
                               })
                             }
                           >
-                            Start case{game.members.length === 1 ? ' solo' : ''}
+                            <span className="orbit-icon" aria-hidden="true">
+                              ⌾
+                            </span>
+                            <span>
+                              {game.hostId !== profile.id
+                                ? 'Awaiting host'
+                                : game.members.length === 1
+                                  ? 'Start case solo'
+                                  : 'Start investigation'}
+                            </span>
+                            <small>
+                              {game.members.length === 1 ? 'ONE INVESTIGATOR' : 'TEAM READY'}
+                            </small>
                           </button>
                         )}
-                        <button className="btn ghost" onClick={() => setModal('invite')}>
-                          Invite / room details
+                        <button
+                          className={
+                            game.status === 'waiting' ? 'btn ghost orbit-button' : 'btn ghost'
+                          }
+                          onClick={() => setModal('invite')}
+                        >
+                          {game.status === 'waiting' && (
+                            <span className="orbit-icon" aria-hidden="true">
+                              ◎
+                            </span>
+                          )}
+                          <span>Invite / room details</span>
+                          {game.status === 'waiting' && <small>PRIVATE CHANNEL</small>}
                         </button>
                         {game.status === 'closed' && (
                           <button className="btn" onClick={() => setPage('accusation')}>
@@ -558,42 +652,46 @@ export default function Nightwatch() {
                         ))}
                       </div>
                     </section>
-                    <div className="section-head">
-                      <h2>Investigate the museum</h2>
-                      <small>{game.shared.length}/10 shared</small>
-                    </div>
-                    <section className="location-grid">
-                      {dossier.locations.map((l) => (
-                        <button
-                          key={l.id}
-                          className="location"
-                          disabled={busy || game.status === 'waiting'}
-                          onClick={() => void perform(() => inspect(l.id))}
-                        >
-                          <div className="location-graphic">
-                            <span aria-hidden="true">{l.icon}</span>
-                          </div>
-                          <div className="location-copy">
-                            <h3>{l.name}</h3>
-                            <p>{l.type}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </section>
-                    <div className="section-head">
-                      <h2>Latest developments</h2>
-                    </div>
-                    <section className="panel">
-                      {game.events
-                        .slice(-8)
-                        .reverse()
-                        .map((e, i) => (
-                          <div className="feed" key={i}>
-                            {e.text}
-                            <time>{when(e.at)}</time>
-                          </div>
-                        ))}
-                    </section>
+                    {game.status !== 'waiting' && (
+                      <>
+                        <div className="section-head">
+                          <h2>Investigate the museum</h2>
+                          <small>{game.shared.length}/10 shared</small>
+                        </div>
+                        <section className="location-grid">
+                          {dossier.locations.map((l) => (
+                            <button
+                              key={l.id}
+                              className="location"
+                              disabled={busy || game.status === 'waiting'}
+                              onClick={() => void perform(() => inspect(l.id))}
+                            >
+                              <div className="location-graphic">
+                                <span aria-hidden="true">{l.icon}</span>
+                              </div>
+                              <div className="location-copy">
+                                <h3>{l.name}</h3>
+                                <p>{l.type}</p>
+                              </div>
+                            </button>
+                          ))}
+                        </section>
+                        <div className="section-head">
+                          <h2>Latest developments</h2>
+                        </div>
+                        <section className="panel">
+                          {game.events
+                            .slice(-8)
+                            .reverse()
+                            .map((e, i) => (
+                              <div className="feed" key={i}>
+                                {e.text}
+                                <time>{when(e.at)}</time>
+                              </div>
+                            ))}
+                        </section>
+                      </>
+                    )}
                   </>
                 )}
                 {page === 'evidence' && (
@@ -789,6 +887,51 @@ export default function Nightwatch() {
                     <Heading title="Your working theory.">
                       Notes persist and appear for both investigators without refreshing.
                     </Heading>
+                    <section className="panel intelligence-panel">
+                      <div className="section-head">
+                        <div>
+                          <span className="eyebrow">ANTHROPIC / EVIDENCE ASSISTANT</span>
+                          <h2>Focus the investigation.</h2>
+                        </div>
+                        <button
+                          className="btn ghost"
+                          disabled={busy || !game.shared.length}
+                          onClick={() =>
+                            void perform(async () => setRecap(await api('recap', {}, game.code)))
+                          }
+                        >
+                          Prepare evidence recap
+                        </button>
+                      </div>
+                      <p className="muted">
+                        An assistant selects observations from your shared clues. Every excerpt is
+                        checked against its source. You make the deductions.
+                      </p>
+                      {recap && (
+                        <>
+                          <p className="eyebrow">
+                            BASED ON {recap.evidenceCount} SHARED CLUES
+                            {recap.evidenceCount !== game.shared.length
+                              ? ' / NEW EVIDENCE AVAILABLE'
+                              : ''}
+                          </p>
+                          {recap.observations.map((o) => (
+                            <blockquote key={o.evidenceId}>
+                              <p>“{o.quote}”</p>
+                              <button
+                                className="text-btn"
+                                onClick={() => {
+                                  setLocationClues([])
+                                  setClue(game.shared.find((c) => c.id === o.evidenceId) || null)
+                                }}
+                              >
+                                Source: {game.shared.find((c) => c.id === o.evidenceId)?.title}
+                              </button>
+                            </blockquote>
+                          ))}
+                        </>
+                      )}
+                    </section>
                     <section className="panel">
                       <form
                         className="note-form"
@@ -883,6 +1026,38 @@ export default function Nightwatch() {
                       >
                         The final investigation report.
                       </Heading>
+                      <section className="panel report-export">
+                        <div>
+                          <span className="eyebrow">CLOUDCONVERT / CASE ARCHIVE</span>
+                          <p>Take your complete findings, evidence and notebook with you.</p>
+                        </div>
+                        <button
+                          className="btn ghost"
+                          disabled={busy}
+                          onClick={() =>
+                            void perform(async () => {
+                              const result = await api<{ downloadUrl: string }>(
+                                'report',
+                                {},
+                                game.code,
+                              )
+                              setReportUrl(result.downloadUrl)
+                            })
+                          }
+                        >
+                          Prepare PDF report
+                        </button>
+                        {reportUrl && (
+                          <a
+                            className="btn"
+                            href={reportUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Download case report
+                          </a>
+                        )}
+                      </section>
                       <section className="reveal-head">
                         <span className="eyebrow">THE MIDNIGHT MUSEUM HEIST</span>
                         <h2>{game.reveal.title}</h2>
@@ -1078,10 +1253,6 @@ export default function Nightwatch() {
                   ))}
               </>
             ) : null}
-            <footer className="foot">
-              <span>NIGHTWATCH / ORIGINAL CASE FILES</span>
-              <span>DeepSpace authentication · records · live sync</span>
-            </footer>
           </main>
         </div>
       </div>

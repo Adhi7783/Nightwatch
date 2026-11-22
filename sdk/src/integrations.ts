@@ -26,5 +26,8 @@ export const integrations: Record<
 > = {
   google: { billing: 'user' },
   composio: { billing: 'user' },
-  // openai: { billing: 'developer', anonymous: true },
+  // Called only through the bounded Nightwatch server feature routes.
+  anthropic: { billing: 'developer' },
+  elevenlabs: { billing: 'developer' },
+  cloudconvert: { billing: 'developer' },
 }
