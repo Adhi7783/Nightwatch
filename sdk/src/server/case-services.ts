@@ -1,6 +1,7 @@
 import { apiWorkerFetch } from 'deepspace/worker'
 import type { Env } from '../../worker'
 import type { Profile, PublicGame } from '../game/types'
+import { verifiedRecap } from './verified-recap'
 
 // Fixed, hand-authored narration. Neither the solution nor the user's text is sent to TTS.
 export const openingBrief =
@@ -127,32 +128,12 @@ export async function feature(
         ?.filter((x: any) => x.type === 'text')
         .map((x: any) => x.text)
         .join('')
-      let parsed: any
+      let observations
       try {
-        parsed = JSON.parse(text)
+        observations = verifiedRecap(text || '', earned)
       } catch {
         throw Error('The assistant could not produce a verified recap. Please retry shortly.')
       }
-      const seen = new Set<string>()
-      const observations = Array.isArray(parsed.observations)
-        ? parsed.observations
-            .slice(0, 4)
-            .filter((o: any) => {
-              const source = earned.find((c) => c.id === o.evidenceId)
-              if (
-                !source ||
-                typeof o.quote !== 'string' ||
-                o.quote.length < 20 ||
-                o.quote.length > 260 ||
-                !source.body.includes(o.quote) ||
-                seen.has(source.id)
-              )
-                return false
-              seen.add(source.id)
-              return true
-            })
-            .map((o: any) => ({ evidenceId: o.evidenceId, quote: o.quote }))
-        : []
       if (!observations.length)
         throw Error('The assistant could not verify its citations. Please retry shortly.')
       value = {
