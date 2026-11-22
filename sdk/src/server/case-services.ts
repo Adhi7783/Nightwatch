@@ -23,8 +23,9 @@ async function call(env: Env, endpoint: string, body: unknown): Promise<any> {
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + env.APP_OWNER_JWT,
-      'x-app-identity-token': env.APP_IDENTITY_TOKEN,
-      'x-app-id': env.DEEPSPACE_APP_ID,
+      ...(env.APP_IDENTITY_TOKEN
+        ? { 'x-app-identity-token': env.APP_IDENTITY_TOKEN, 'x-app-id': env.DEEPSPACE_APP_ID }
+        : {}),
     },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(90000),

@@ -214,7 +214,7 @@ export const reveal = {
         'The discarded signed assessment and audit warning establish why Mara wanted the instrument unavailable for examination.',
     },
   ],
-  title: 'The theft happened before the lights went out.',
+  title: 'The alarm was the final act.',
   culprit: 'Mara Voss',
   summary:
     'Mara removed the museum’s catalogued Meridian during her authorized 17:40 inspection and installed a newly cast resin decoy, weighted to the same 840 g. The crescent flaw from her silicone mold appears on the decoy in the gala photograph. She sealed the front door and the conservation setup hatch before the guests arrived.',
