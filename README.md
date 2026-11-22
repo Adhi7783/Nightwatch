@@ -9,10 +9,10 @@ Nightwatch is an original cooperative detective game built on DeepSpace. One or 
 
 1. Sign in with GitHub or Google through DeepSpace and choose your detective name.
 2. In Mission Control, create a private room or join using a code/link. Returning accounts can resume their saved rooms.
-3. Invite one partner before starting, or start solo. Only the host can start the investigation.
+3. Listen to the short, word-synchronized opening briefing on your first case entry, or explicitly skip it. Invite one partner before starting, or start solo. Only the host can start the investigation. Click the centered Nightwatch logo to open navigation.
 4. Inspect four museum locations and share discoveries. Review or mark evidence important, connect it to suspects/other evidence, and record working theories in the shared notebook.
 5. Choose a suspect, method, motive and supporting evidence, then explain the connections. In a two-person case, both investigators submit a matching conclusion with sufficient support.
-6. A correct theory unlocks the full explanation, evidence reasoning, reconstruction and contribution report. Incorrect theories stay spoiler-safe. Both investigators may instead agree to reveal the answer; that records a revealed case rather than a solved case.
+6. Ask the shared notebook's evidence assistant to select cited observations from earned clues. A correct theory unlocks the full explanation, evidence reasoning, reconstruction and contribution report, with PDF export. Incorrect theories stay spoiler-safe. Both investigators may instead agree to reveal the answer; that records a revealed case rather than a solved case.
 
 Profiles belong to the authenticated DeepSpace account rather than a browser-only identity. Progress is persisted through RecordRoom and synchronized through its live subscription protocol.
 
@@ -63,13 +63,13 @@ No credentials, test-account passwords, `.dev.vars`, or session backups belong i
 
 ## Scope and platform choices
 
-DeepSpace authentication provides persistent identity; RecordRoom provides records and live updates; schemas and verified server routes enforce permissions. These are native platform capabilities, not three third-party McAPI integrations. No external AI/email/payment integration was added to inflate a count. AI never judges correctness.
+DeepSpace authentication provides persistent identity; RecordRoom provides records and live updates; schemas and verified server routes enforce permissions. In addition, three real DeepSpace catalog integrations support the product: **ElevenLabs** narrates the authored briefing with timing alignment, **Anthropic** selects source-verified observations from shared evidence, and **CloudConvert** exports closed-case reports as PDF. All run through the DeepSpace worker integration proxy. No vendor API keys are stored in the app. AI never judges correctness. See [integration design and limits](docs/INTEGRATIONS.md).
 
-The main tradeoff is one complete authored case and structured saved connections rather than a draggable canvas or generated mysteries. AI recap/hints, extra cases, cursors, audio and achievements are optional future work.
+The main tradeoff is one complete authored case and structured saved connections rather than a draggable canvas or generated mysteries. The assistant selects exact source text rather than inventing hints. Extra cases, cursors and achievements remain outside this release. The command interface uses original mechanical SVG animation, black surfaces and translucent blue light; reduced-motion preferences disable decorative animation.
 
 ## Verification and submission
 
-GitHub Actions runs the 13 deduction tests, TypeScript validation and production build. Live verification covers native profiles, private rooms, host start, evidence, reviews, pins, links, notes, actual SDK WebSocket broadcasts, input and duplicate-action rejection, incorrect/correct joint accusations, solo completion and preserved reports. See the checked-in verification record for the final counts and CI run.
+GitHub Actions runs 18 deduction and recap-validation tests, TypeScript validation and the production build. Live verification covers 42 native game/security checks and 16 integration checks, including actual provider responses and a downloaded PDF. See the checked-in verification record for exact release references and execution limits.
 
 Browser checks cover native sign-in, the applicant's saved detective name, room creation/invitation, reload restoration, and the signed-in 390 px layout. The full solve/security path was tested through real HTTP and independent WebSocket sessions. The complete two-browser UI acceptance specification is provided in `sdk/tests/collab.spec.ts`; do not claim it ran unless recorded.
 

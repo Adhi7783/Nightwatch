@@ -43,11 +43,11 @@ The last column below records the checks identified at the beginning of this aud
 
 ## Integrations wording
 
-The main exercise states no minimum integration count; the later helpful bar says at least three. The product brief explicitly resolves this by choosing useful platform capabilities. Nightwatch uses DeepSpace authentication, persistent RecordRoom records, real-time subscriptions, and server-enforced permissions. These are **native capabilities**, not three third-party McAPI integrations. No external AI, email or payment integration is added merely to inflate a count. If the portal requires three external integrations literally, clarify that requirement before claiming it is met.
+The main exercise states no minimum integration count; the later helpful bar says at least three. The November 21 revision now uses **three actual DeepSpace catalog integrations**, independently of native authentication, records, live sync and permissions: Anthropic evidence recaps, ElevenLabs timed narration, and CloudConvert closed-case PDF exports. Real production provider calls and access/cache checks passed. See `INTEGRATIONS.md` for their product purpose, privacy boundaries and usage limits.
 
 ## Scope deliberately left out
 
-AI recaps/hints, collaborative Canvas, voice, extra cases, monetization, animation-heavy effects, and generated mysteries are optional and excluded from the core. AI never decides whether an accusation is correct.
+Collaborative Canvas, extra cases, monetization and generated mysteries remain excluded. The requested evidence recap, narrated opening and original mechanical command animation are now implemented. AI never decides whether an accusation is correct.
 
 ## Still requires the applicant
 

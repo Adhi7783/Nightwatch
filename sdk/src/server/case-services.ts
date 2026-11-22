@@ -77,7 +77,7 @@ export async function feature(
       name === 'briefing'
         ? 'briefing:v3'
         : name +
-          ':v3:' +
+          (name === 'report' ? ':v4:' : ':v3:') +
           game!.code +
           ':' +
           (await hash(name === 'recap' ? game!.shared.map((c) => c.id).sort() : game!.closedAt))
@@ -162,6 +162,17 @@ export async function feature(
         para('Motive', r.motive) +
         para('Recovery', r.recovery) +
         para('Other suspects', r.exonerated) +
+        '<h2>Why the evidence fits</h2>' +
+        r.proof
+          .map(
+            (item) =>
+              '<article><b>' +
+              escape(g.shared.find((c) => c.id === item.id)?.title || item.id) +
+              '</b><p>' +
+              escape(item.reason) +
+              '</p></article>',
+          )
+          .join('') +
         '<h2>Reconstructed timeline</h2>' +
         r.timeline
           .map(([time, text]) => '<p><b>' + escape(time) + '</b> ' + escape(text) + '</p>')
@@ -179,10 +190,21 @@ export async function feature(
               '<blockquote>' +
               escape(n.text) +
               '<br><small>' +
-              escape(g.members.find((m) => m.id === n.by)?.name || 'Investigator') +
+              escape(g.members.find((m) => m.id === n.by)?.name || n.by || 'Investigator') +
               '</small></blockquote>',
           )
           .join('') || '<p>No notebook entries.</p>') +
+        '<h2>Recorded accusations</h2>' +
+        (g.submissions
+          .map(
+            (s) =>
+              '<article><b>' +
+              escape(s.by) +
+              '</b><p>' +
+              escape(s.theory.explanation) +
+              '</p></article>',
+          )
+          .join('') || '<p>No accusations recorded.</p>') +
         '<h2>Team contributions</h2>' +
         g.members
           .map((m) => {
