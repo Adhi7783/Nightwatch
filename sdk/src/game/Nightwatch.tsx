@@ -142,6 +142,9 @@ export default function Nightwatch() {
     explanation: '',
   })
   const activeCode = game?.code
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [page, activeCode])
   const requestRef = useRef<{ body: string; id: string } | null>(null)
   const generation = useRef(0)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -589,7 +592,7 @@ export default function Nightwatch() {
                   <>
                     <Heading title={game.title}>
                       {game.status === 'waiting'
-                        ? 'Lobby .  the host chooses when to begin.'
+                        ? 'Lobby. The host chooses when to begin.'
                         : game.status === 'closed'
                           ? 'Completed investigation. Your history is preserved.'
                           : 'Inspect, compare, and connect the evidence.'}
