@@ -45,4 +45,4 @@
   --color-shell-panel: #ffffff;
 }
 
-[data-theme="nightwatch"]{color-scheme:dark;--color-background:#0c141c;--color-foreground:#edf3f6;--color-card:#14212b;--color-card-foreground:#edf3f6;--color-popover:#14212b;--color-popover-foreground:#edf3f6;--color-primary:#89dce5;--color-primary-foreground:#0d2028;--color-muted:#1b2c39;--color-muted-foreground:#a4b6c2;--color-border:#304450;--color-ring:#89dce5}
+[data-theme="nightwatch"]{color-scheme:dark;--color-background:#020507;--color-foreground:#edf3f6;--color-card:#14212b;--color-card-foreground:#edf3f6;--color-popover:#14212b;--color-popover-foreground:#edf3f6;--color-primary:#89dce5;--color-primary-foreground:#0d2028;--color-muted:#1b2c39;--color-muted-foreground:#a4b6c2;--color-border:#304450;--color-ring:#89dce5}
