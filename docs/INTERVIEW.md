@@ -24,7 +24,7 @@
 
 - npm installation: DNS/TLS failures to npm registries; used the official direct publisher for hosted builds instead of disabling certificate checks.
 - Original mobile heading: status tag squeezed the heading into a narrow column; changed the small-screen layout.
-- WebSocket mutation bypass: sent a direct `core.put` against the original game record; RecordRoom denied it. This check must be repeated on the SDK revision.
+- WebSocket mutation bypass: sent a direct `core.put` against the original game record; RecordRoom denied it. The production SDK regression now repeats this check.
 - Scaffold/archive mismatch: current generated routes referenced exports absent from the older prototype archive. Restored the exact package version from the current official scaffold rather than guessing local replacement SDK methods.
 - Failed builds save a new source revision even when the old release stays live. The deployment helper now reads current source revision before submitting an update.
 - TypeScript did not narrow nullable room/member values through an inferred arrow-function failure helper. An explicit `never`-returning function declaration made the boundary clear; the strict CI check then passed.
@@ -36,3 +36,9 @@
 ## What the applicant should record
 
 For each real issue you investigate: observed error, hypothesis, smallest test, result, change, and verification. Record your own observations in `docs/APPLICANT-VERIFICATION.md`; do not copy the agent's checks as personal work.
+
+## Explain the integration tradeoffs
+
+The three integrations are described in INTEGRATIONS.md. The worker owns the provider inputs and billing identity; callers cannot choose prompts, models, voices or arbitrary files. A global RecordRoom serializes cache reservations and daily usage limits across workers. Anthropic sees only earned evidence and the server validates citations before returning authored excerpts. ElevenLabs timing follows actual audio time and briefing completion persists to the account. CloudConvert receives escaped report HTML only after room membership and closure checks. Provider failures do not bypass game rules.
+
+A real provider response exposed fenced JSON and curly-to-straight quotation conversion. The parser accepts a narrow formatting normalization and returns original source text. Tests reject semantic changes. Rendered PDF review caught a display-name versus user-ID attribution assumption, which was corrected before the final report release.

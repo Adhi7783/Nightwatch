@@ -1,55 +1,48 @@
 # Nightwatch verification record
 
-Production: https://nightwatch-meridian.app.space  
-Repository: https://github.com/Adhi7783/Nightwatch  
-Runtime source commit: `f3e002a2e8d2fde47caca434bfda20bee0a9f6b9`  
-Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/44699104780  
-Production release: `rel_01M7VZNAWGGDWH3WFEQ1SH5GRJ`
+Production: https://nightwatch-meridian.app.space
+Repository: https://github.com/Adhi7783/Nightwatch
+Runtime source: 9bceb1b1028d1992cec25a74ae219957cecccdb0
+Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/44993787902
+Production release: rel_01M80Z2V82N83SQTQTX0A64D1P
 
-GitHub Actions installed the exact SDK dependencies, ran 13 deterministic tests, passed strict TypeScript validation and built the production Worker/web assets. The resulting package lockfile is committed for reproducibility. The final production source claim was read back from DeepSpace and reported `github: adhi7783/nightwatch`, revision 1.
+The November 21 command-interface revision uses the existing production app ID and GitHub source authority. Saved v2 rooms and native profiles remain in their existing RecordRooms. GitHub Actions installed locked dependencies, passed 18 tests and strict TypeScript validation, and built the deployed Worker and browser assets. No deployment credentials went to GitHub Actions.
 
-## Executed checks
+## Rule and recap validation
 
-**13 local and CI deduction tests:** case structure and unique IDs; valid supported solution; missing required support; wrong suspect; unknown suspect; unshared/unknown/duplicate/empty/non-array evidence; explanation boundaries; matching and mismatched joint conclusions; and complete canonical evidence references.
+Eighteen tests passed locally and in CI. Thirteen cover case structure, canonical evidence references, supported and unsupported theories, unknown/unshared/duplicate/empty evidence, explanation limits and matching joint conclusions. Five cover provider JSON formatting, restoration of authored quotation marks, rejection of invented claims, rejection of unearned or duplicate citations, and malformed output.
 
-**42 production checks using three real native-auth fixture accounts:**
+## Real cooperative game regression
 
-- Native platform-JWT profiles persisted across requests; unsigned identity was refused.
-- Room creation entered the lobby, the partner joined, a third investigator was refused, and only the host could start.
-- Invalid invitation codes were rejected clearly; nonmembers could neither read nor modify the room.
-- Forged internal identity headers, cross-origin sockets and direct socket mutations were refused.
-- A separate authenticated WebSocket client received a real RecordRoom snapshot and live evidence change.
-- Three required suspect roles and ten authored evidence items were available; the unsolved room had no reveal.
-- Shared review state, importance flags, evidence-to-suspect links and evidence-to-evidence links persisted across independent clients.
-- Duplicate/invalid connections were refused.
-- Identical request retries did not duplicate notes; reusing an ID with different input was refused.
-- Concurrent investigator writes preserved both notes.
-- Unknown/duplicate supporting evidence and duplicate pending accusations were rejected.
-- Incorrect accusations gave spoiler-safe feedback. One correct vote did not solve a two-person room; matching supported votes did.
-- The full reveal included the reconstructed timeline and explanations for all four required clues.
-- Contribution counters and submission history were preserved. Closed rooms rejected later mutations and remained readable.
-- Completed cases appeared in account history, and a solo investigator could independently finish a case.
-- The server solution file was not accessible as a public asset.
-- Native sign-out cleared the fixture session; signing back in restored the same detective profile.
+Forty-two deployed checks passed using three real native DeepSpace fixture accounts and an independent authenticated WebSocket client. They cover persistent identity, unsigned and forged identity rejection, private-room membership, host-only start, partner capacity, pre-start gates, real RecordRoom snapshots and broadcasts, reviews, importance flags, evidence links, notes, concurrent writes, request deduplication, malformed submissions, spoiler-safe wrong accusations, supported joint and solo solves, full reveals, contribution counters, closed-case immutability, history, source-file protection and native sign-out/sign-in restoration.
 
-The executable regression is `verify-sdk-live.mjs`; local JSON results are in ignored `test-artifacts/sdk-live-verification.json`. Test account credentials are private and are not committed.
+This regression ran on the same game engine immediately before the final PDF-content and remaining palette refinements. Those final changes did not alter game state transitions, authorization or concurrency. They passed CI, then the production integration checks below were rerun after deployment.
 
-## Browser and applicant evidence
+## Three actual integrations
 
-The applicant completed the production account OAuth login, then signed into the production game and selected a detective name. Their saved identity was visible in Mission Control and restored after reload.
+All 16 checks in test-tools/verify-services.mjs passed against the final deployed integration implementation. Subsequent releases removed the legacy navy surface and nested scroll wrapper. Their strict build and desktop/mobile checks passed; no integration or game-engine logic changed:
 
-The agent checked signed-in Mission Control, room creation, the private invitation dialog, host status and lobby restoration. The 390 px layout rendered without horizontal page overflow, and the 1280 px desktop layout was inspected. The native modal provided focus trapping; the deployed Escape/focus-restoration correction was verified by observing focus return to its triggering profile button. The final provisional alibi copy was read in the deployed dossier. Desktop and mobile screenshots were inspected. The user room remains in its lobby with a free partner seat; no solution was revealed in that room.
+- Anonymous voice requests and all three generic paid proxies were rejected.
+- Nonmembers could not request room recaps or reports.
+- Recaps required earned evidence; unfinished cases could not export the reveal.
+- ElevenLabs returned real MP3 audio and finite character timing alignment.
+- Repeated narration used the durable cache; briefing completion persisted on the profile.
+- Anthropic returned observations whose source IDs and exact returned excerpts matched earned evidence.
+- Repeated evidence-version recaps reused their cached result.
+- A supported accusation closed the export fixture.
+- CloudConvert produced an HTTPS download containing an actual PDF, and repeat exports reused the result.
 
-The 42-check production engine regression passed before the last editorial alibi and dialog-focus update. That update did not change server game rules or permissions; it passed the full locked-dependency CI build and was checked in the live browser afterward. The CI/source/release references above identify that final deployed update.
+Downloaded audio and PDF files, fixture credentials and JSON result files are ignored local test artifacts. The report's two initial pages were rendered with Poppler and visually inspected. This caught a notebook-attribution fallback and prompted inclusion of the proof reasoning and recorded accusations. The refined PDF was generated again after deployment and inspected separately. The malicious-looking notebook sample appeared as literal text; pdfinfo reported no embedded JavaScript.
 
-The original DOCX project checklist was read and cross-checked for core, optional, test, source-control and submission requirements. Its checkboxes were not edited.
+## Browser observations
 
-A production log sample was inspected after the deployed test flow: no exception outcomes appeared in the sampled 100 events. Expected authorization/validation denials are generated by security tests and are not treated as unexpected crashes.
+The new interface was inspected at 1280 by 900 and 390 by 844. Mission Control had no horizontal overflow at either width, a centered top logo, blue identity text and red sign-out text. The footer was absent. The sidebar started hidden, opened from the logo and closed on Escape. The waiting room had exactly two circular actions, five animated mechanical assemblies, and no museum location or activity panels. A completed briefing did not reappear on another case entry. Actual audio playback and progressively revealed synchronized briefing words were observed in the browser. Page navigation now resets its scroll position so the command header remains visible on entry.
 
-## Limits and remaining human work
+Native first-time identity uses a required dialog over the mechanical background. The applicant had already saved a name before this revision, so a second fresh-account identity popup was not exercised in the browser during this revision. Its existing save endpoint and persistent profile behavior are covered by the native-account checks.
 
-- The full automated two-browser UI spec in `sdk/tests/collab.spec.ts` is supplied but has not been executed. Complete gameplay and security were exercised with real HTTP sessions and a separate SDK WebSocket client, not mocked services.
-- Sign-in/name setup is the applicant's confirmed personal verification. A full personal partner playthrough, sign-out/sign-in review, keyboard checks and final writeup review remain on `APPLICANT-VERIFICATION.md`.
-- No blanket claim of complete WCAG certification is made. Focus, form labels, native modal behavior, contrast-conscious colors, reduced motion and responsive layouts were implemented; a comprehensive assistive-technology audit is not recorded.
-- AI recap, canvas dragging, sound, additional cases and achievements are optional and not implemented.
-- This work does not submit the application portal or book a live coding session.
+## Execution limits and applicant work
+
+- The full two-browser UI acceptance specification in sdk/tests/collab.spec.ts was updated for the briefing, drawer and dashboard flow. It has not been executed. The complete game/security regression used actual HTTP and independent WebSocket sessions.
+- The applicant confirmed their production OAuth/game sign-in and name setup. Their personal full partner playthrough and final submission review remain their own steps. Do not present agent tests as applicant observations.
+- No blanket WCAG certification or claim of an actor voice clone is made. The narration uses a stock British voice. Native dialogs, labels, focus restoration, reduced-motion handling and responsive layouts are implemented.
+- The application portal was not submitted and no coding session was booked.

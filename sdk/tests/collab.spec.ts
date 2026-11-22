@@ -13,6 +13,9 @@ test('two signed-in investigators share reviews, notes, and evidence connections
     [partner, '__test-partner'],
     [outsider, '__test-outsider'],
   ] as const) {
+    await expect(
+      actor.page.getByRole('button', { name: 'Nightwatch Forensic Command' }),
+    ).toBeVisible()
     if (await actor.page.getByLabel('Detective name', { exact: true }).isVisible()) {
       await actor.page.getByLabel('Detective name', { exact: true }).fill(name)
       await actor.page.getByRole('button', { name: 'Save detective identity' }).click()
@@ -57,5 +60,5 @@ test('two signed-in investigators share reviews, notes, and evidence connections
   await partner.page.getByRole('button', { name: /Shared notebook$/ }).click()
   await expect(partner.page.getByText('__test-note: the display stayed sealed.')).toBeVisible()
   // Full server security, solve/reveal, malformed requests and idempotency are
-  // exercised by verify-sdk-live.mjs against target-bound platform app tokens.
+  // exercised by verify-sdk-live.mjs using native DeepSpace account sessions.
 })

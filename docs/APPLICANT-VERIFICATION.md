@@ -13,6 +13,9 @@ You confirmed in chat that you completed production sign-in and saved your detec
 - [ ] I reloaded/reconnected and checked that progress remained.
 - [ ] I submitted an incorrect theory and checked that no answer was leaked.
 - [ ] I solved the case with supporting evidence and read the final contribution report.
+- [ ] I listened to the opening narration, checked its pacing and subtitles, and confirmed it did not repeat on another case.
+- [ ] I requested a cited evidence recap after sharing clues and checked its sources.
+- [ ] I downloaded and opened a closed-case PDF report.
 - [ ] I checked narrow mobile and keyboard interaction.
 - [ ] I can explain and change the game rules, room authorization, and concurrency behavior.
 - [ ] I confirmed the final `.app.space` URL and GitHub source and removed writeup placeholders.
