@@ -12,6 +12,11 @@ test('verified recap accepts provider JSON with or without markdown fences', () 
 test('recap rejects an invented fact even when it cites a real clue', () => {
   assert.deepEqual(verifiedRecap(JSON.stringify({ observations: [{ ...entry, quote: 'The security guard stole the instrument.' }] }), earned), [])
 })
+test('typographic quote normalization returns the exact authored source punctuation', () => {
+  const body = 'Julian’s signed work order says “move the sealed cradle”.'
+  const input = JSON.stringify({ observations: [{ evidenceId: 'order', quote: 'Julian\'s signed work order says "move the sealed cradle".' }] })
+  assert.deepEqual(verifiedRecap(input, [{ id: 'order', body }]), [{ evidenceId: 'order', quote: body }])
+})
 test('recap cannot cite unearned evidence, duplicate citations or invalid entries', () => {
   assert.deepEqual(verifiedRecap(JSON.stringify({ observations: [null, { quote: fact }, { ...entry, evidenceId: 'hidden-solution' }, entry, entry] }), earned), [entry])
 })

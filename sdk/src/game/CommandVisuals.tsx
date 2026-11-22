@@ -89,6 +89,7 @@ export function Briefing({
     [error, setError] = useState(''),
     [saving, setSaving] = useState(false)
   const audio = useRef<HTMLAudioElement>(null)
+  const [directory, setDirectory] = useState(false)
   const fetchBrief = async () => {
     setError('')
     try {
@@ -138,6 +139,47 @@ export function Briefing({
       aria-modal="true"
       aria-labelledby="briefing-heading"
     >
+      <header className="command-header briefing-brand-header">
+        <span className="header-system">
+          N/W OS <i /> SECURE
+        </span>
+        <button
+          className="brand text-btn"
+          aria-label="Nightwatch Forensic Command"
+          aria-expanded={directory}
+          aria-controls="briefing-directory"
+          onClick={() => setDirectory((v) => !v)}
+        >
+          <span className="brandmark">N</span>
+          <span>
+            NIGHTWATCH<small>FORENSIC COMMAND</small>
+          </span>
+        </button>
+      </header>
+      {directory && (
+        <>
+          <button
+            className="nav-shade"
+            aria-label="Close navigation"
+            onClick={() => setDirectory(false)}
+          />
+          <aside className="rail briefing-directory" id="briefing-directory">
+            <div className="rail-label">COMMAND DIRECTORY</div>
+            <button
+              className="btn ghost"
+              onClick={() => {
+                setDirectory(false)
+                void finish()
+              }}
+            >
+              Continue to case
+            </button>
+            <button className="text-btn" onClick={() => setDirectory(false)}>
+              Return to transmission
+            </button>
+          </aside>
+        </>
+      )}
       <div className="briefing-top">
         <span className="eyebrow">INCOMING TRANSMISSION / CASE 001</span>
         <span className="transmission-light">
