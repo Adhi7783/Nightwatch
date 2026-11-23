@@ -10,7 +10,7 @@ Nightwatch uses three catalog integrations through `apiWorkerFetch` from `deepsp
 
 ## Narration
 
-The voice is ElevenLabs' stock British narrator George, with restrained delivery. It is not an actor voice clone. The fixed briefing contains no solution or user text. Audio and alignment are cached globally for 30 days. A persisted profile flag records completed or explicitly skipped briefing playback. The fullscreen sequence does not return on subsequent case entries. Browsers that block autoplay receive an explicit play control; the transmission can be paused, read or skipped. Decorative motion respects reduced-motion preferences.
+The voice is ElevenLabs' stock British narrator George, with restrained delivery. It is not an actor voice clone. The fixed briefing contains no solution or user text. Audio and alignment are cached globally for 30 days. A persisted list on the profile records completed or explicitly skipped playback by room code. Every new case receives the opening transmission. Resuming that case does not force it again; a small top control replays audio only. Legacy global completion migrates existing room history without marking future rooms. Browsers that block autoplay receive an explicit play control; the transmission can be paused, read or skipped. Decorative motion respects reduced-motion preferences.
 
 ## Evidence boundary
 
@@ -28,4 +28,4 @@ These limits bound application-triggered calls, not a fixed dollar budget. Provi
 
 ## Verification
 
-`test-tools/verify-services.mjs` uses the existing private fixture accounts and performs 16 production checks. It verifies anonymous and nonmember rejection, locked generic proxies, pre-start/closed-case gates, real ElevenLabs audio/timing, one-time profile persistence, Anthropic citations, a real downloadable PDF and durable result reuse. Fixtures and downloaded artifacts are ignored by Git. Five pure recap tests cover provider formatting, punctuation restoration and rejection of unsupported claims or citations.
+`test-tools/verify-services.mjs` uses the existing private fixture accounts and performs 18 production checks. It verifies anonymous and nonmember rejection, locked generic proxies, pre-start/closed-case gates, real ElevenLabs audio/timing, per-case profile persistence and nonmember rejection, Anthropic citations, a real downloadable PDF and durable result reuse. Fixtures and downloaded artifacts are ignored by Git. Five pure recap tests cover provider formatting, punctuation restoration and rejection of unsupported claims or citations.

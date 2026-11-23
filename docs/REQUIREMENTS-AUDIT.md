@@ -4,7 +4,7 @@ The detailed product brief and exercise text supplied on November 19, 2026 are t
 
 ## Final implementation status
 
-The production app is https://nightwatch-meridian.app.space and its source claim was verified as GitHub repository `adhi7783/nightwatch`. The SDK revision has passed GitHub TypeScript/build validation, 18 deterministic and recap-validation tests, and deployed native-account security/game-flow checks. The applicant confirmed production sign-in and detective-name setup; the saved identity was visible after reload. Signed-in desktop/mobile Mission Control, room creation, invitations and lobby restoration were checked in the browser.
+The production app is https://nightwatch-meridian.app.space and its source claim was verified as GitHub repository `adhi7783/nightwatch`. The SDK revision has passed GitHub TypeScript/build validation, 25 game, recap, briefing-history and geometry tests, and deployed native-account security/game-flow checks. The applicant confirmed production sign-in and detective-name setup; the saved identity was visible after reload. Signed-in desktop/mobile Mission Control, room creation, invitations and lobby restoration were checked in the browser.
 
 The original `Nightwatch_Project_Build_Checklist.docx` was located beside the project and its full checklist text was cross-checked against this implementation. The document itself was read, not edited or marked complete on the applicant's behalf.
 
@@ -58,3 +58,7 @@ Collaborative Canvas, extra cases, monetization and generated mysteries remain e
 - Edit the submission note to describe only what you actually checked or changed.
 
 Deadline: Monday, November 23, 2026, 11:59 PM Eastern / 8:59 PM Pacific.
+
+## Latest visual and narration revision
+
+The November 23 request supersedes the one-time-per-profile opening and the side drawer. Briefings are now tracked per room, with audio-only replay at the top of a case. The NIGHTWATCH text wordmark opens a full-screen phase menu. Mission Control is centered, and an isolated 3D instrument and rotating machinery use original geometry across the main pages. See VISUAL-DIRECTION.md and VERIFICATION.md for the research, execution evidence and limits.

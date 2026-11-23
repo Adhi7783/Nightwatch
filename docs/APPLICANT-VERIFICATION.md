@@ -13,7 +13,7 @@ You confirmed in chat that you completed production sign-in and saved your detec
 - [ ] I reloaded/reconnected and checked that progress remained.
 - [ ] I submitted an incorrect theory and checked that no answer was leaked.
 - [ ] I solved the case with supporting evidence and read the final contribution report.
-- [ ] I listened to the opening narration, checked its pacing and subtitles, and confirmed it did not repeat on another case.
+- [ ] I heard the opening narration for a new case, checked its typing and pacing, then replayed only the audio from inside that case. I confirmed another new case receives its own opening.
 - [ ] I requested a cited evidence recap after sharing clues and checked its sources.
 - [ ] I downloaded and opened a closed-case PDF report.
 - [ ] I checked narrow mobile and keyboard interaction.
