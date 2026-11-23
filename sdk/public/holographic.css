@@ -146,7 +146,7 @@ dialog.phase-menu {
   height: 100dvh;
   max-height: none;
   margin: 0;
-  padding: 28px 5vw 25px;
+  padding: 142px 5vw 25px;
   border: 0;
   background: radial-gradient(ellipse at 50% 45%, #0a2d4652, #01050940 75%);
   color: #8ecbff;
@@ -162,9 +162,9 @@ dialog.phase-menu[open] { display: grid; place-items: center; }
   animation: phase-background .4s ease both;
 }
 .phase-shell { width: min(1040px, 100%); margin: auto; }
-.phase-header { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; }
-.phase-header .wordmark { font-size: 28px; }
-.phase-close { position: absolute; right: 0; top: 50%; translate: 0 -50%; border: 1px solid #6cbdff40; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; color: #87c6f8; }
+.phase-header { position: fixed; inset: 0 0 auto; height: 100px; display: flex; justify-content: center; align-items: center; margin: 0; background: linear-gradient(#020609c9, #02060933); backdrop-filter: blur(6px); z-index: 2; }
+.phase-header .wordmark { font-size: 27px; }
+.phase-close { position: absolute; right: 5vw; top: 50%; translate: 0 -50%; border: 1px solid #6cbdff40; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; color: #87c6f8; }
 .phase-heading { text-align: center; margin-bottom: 37px; }
 .phase-heading .eyebrow { font-family: var(--display); font-size: 9px; letter-spacing: .3em; color: #438cc1; }
 .phase-heading h2 { font: 400 clamp(21px, 2.9vw, 34px)/1.5 var(--display); color: #7cc3f8b8; text-shadow: 0 0 24px #278de644; letter-spacing: .05em; margin: 14px 0 0; }
@@ -241,7 +241,6 @@ dialog.phase-menu[open] { display: grid; place-items: center; }
   .hero-art { min-height: 410px; }
   .phase-tile { gap: 14px; padding: 19px; }
   .phase-tile strong { font-size: 18px; }
-  .phase-header { margin-bottom: 28px; }
   .top-actions { gap: 10px; }
 }
 @media (max-width: 560px) {
@@ -264,10 +263,10 @@ dialog.phase-menu[open] { display: grid; place-items: center; }
   .topbar > .eyebrow { max-width: 90px; font-size: 7px; letter-spacing: 1px; }
   .briefing-replay-button { font-size: 7px; padding: 7px 8px; gap: 6px; }
   .room-pill { font-size: 8px; padding: 8px; }
-  dialog.phase-menu { padding: 20px; }
+  dialog.phase-menu { padding: 124px 20px 20px; }
   .phase-header { margin: 0 0 28px; padding-right: 0; }
-  .phase-header .wordmark { font-size: 20px; }
-  .phase-close { width: 30px; height: 30px; font-size: 20px; right: -6px; }
+  .phase-header .wordmark { font-size: 22px; }
+  .phase-close { width: 30px; height: 30px; font-size: 20px; right: 20px; }
   .phase-heading { margin-bottom: 25px; }
   .phase-heading .eyebrow { font-size: 7px; }
   .phase-heading h2 { font-size: 20px; }
