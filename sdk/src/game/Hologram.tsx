@@ -53,7 +53,7 @@ export function Hologram({ scene, className = '' }: { scene: HologramScene; clas
       camera: WebGLUniformLocation | null = null,
       alpha: WebGLUniformLocation | null = null,
       clock: WebGLUniformLocation | null = null
-    const useFallback = () => {
+    const enableFallbackRenderer = () => {
       gl = null
       canvas.hidden = true
       fallback.hidden = false
@@ -69,7 +69,7 @@ export function Hologram({ scene, className = '' }: { scene: HologramScene; clas
         powerPreference: 'low-power',
       })
       resources = gl
-      if (!gl) useFallback()
+      if (!gl) enableFallbackRenderer()
       else {
         const compile = (type: number, source: string) => {
           const shader = gl!.createShader(type)!
@@ -105,7 +105,7 @@ export function Hologram({ scene, className = '' }: { scene: HologramScene; clas
         canvas.dataset.renderer = 'webgl'
       }
     } catch {
-      useFallback()
+      enableFallbackRenderer()
     }
     const render = (now: number) => {
       frame = 0
@@ -196,7 +196,7 @@ export function Hologram({ scene, className = '' }: { scene: HologramScene; clas
     }
     const contextLost = (event: Event) => {
       event.preventDefault()
-      useFallback()
+      enableFallbackRenderer()
       resume()
     }
     canvas.addEventListener('webglcontextlost', contextLost)

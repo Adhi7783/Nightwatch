@@ -14,7 +14,7 @@ test('two signed-in investigators share reviews, notes, and evidence connections
     [outsider, '__test-outsider'],
   ] as const) {
     await expect(
-      actor.page.getByRole('button', { name: 'Nightwatch Forensic Command' }),
+      actor.page.getByRole('button', { name: 'Nightwatch navigation' }),
     ).toBeVisible()
     if (await actor.page.getByLabel('Detective name', { exact: true }).isVisible()) {
       await actor.page.getByLabel('Detective name', { exact: true }).fill(name)
@@ -36,27 +36,27 @@ test('two signed-in investigators share reviews, notes, and evidence connections
   await expect(partner.page.getByText('Inspect, compare, and connect the evidence.')).toBeVisible()
   await host.page.getByRole('button', { name: /The Meridian Gallery/ }).click()
   await host.page.getByRole('button', { name: 'Share with the investigation' }).click()
-  await partner.page.getByRole('button', { name: 'Nightwatch Forensic Command' }).click()
+  await partner.page.getByRole('button', { name: 'Nightwatch navigation' }).click()
   await partner.page.getByRole('button', { name: /Evidence board$/ }).click()
   await expect(partner.page.getByRole('heading', { name: 'The unbroken seal' })).toBeVisible()
   await partner.page.getByLabel('Reviewed by me').check()
-  await host.page.getByRole('button', { name: 'Nightwatch Forensic Command' }).click()
+  await host.page.getByRole('button', { name: 'Nightwatch navigation' }).click()
   await host.page.getByRole('button', { name: /Evidence board$/ }).click()
   await expect(host.page.getByText(/Reviewed by __test-partner/)).toBeVisible()
   await partner.page.getByLabel('From evidence').selectOption('seal')
   await partner.page.getByLabel('Connect to').selectOption('suspect:mara')
   await partner.page.getByRole('button', { name: 'Save connection' }).click()
   await expect(host.page.getByText('Mara Voss', { exact: true })).toBeVisible()
-  await host.page.getByRole('button', { name: 'Nightwatch Forensic Command' }).click()
+  await host.page.getByRole('button', { name: 'Nightwatch navigation' }).click()
   await host.page.getByRole('button', { name: /Shared notebook$/ }).click()
   await host.page.getByLabel('Case note').fill('__test-note: the display stayed sealed.')
   await host.page.getByRole('button', { name: 'Save note' }).click()
-  await partner.page.getByRole('button', { name: 'Nightwatch Forensic Command' }).click()
+  await partner.page.getByRole('button', { name: 'Nightwatch navigation' }).click()
   await partner.page.getByRole('button', { name: /Shared notebook$/ }).click()
   await expect(partner.page.getByText('__test-note: the display stayed sealed.')).toBeVisible()
   await partner.page.reload()
   await partner.page.getByRole('button', { name: 'Resume', exact: true }).first().click()
-  await partner.page.getByRole('button', { name: 'Nightwatch Forensic Command' }).click()
+  await partner.page.getByRole('button', { name: 'Nightwatch navigation' }).click()
   await partner.page.getByRole('button', { name: /Shared notebook$/ }).click()
   await expect(partner.page.getByText('__test-note: the display stayed sealed.')).toBeVisible()
   // Full server security, solve/reveal, malformed requests and idempotency are

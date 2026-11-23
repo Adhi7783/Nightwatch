@@ -97,6 +97,7 @@ export function PhaseMenu({
             <button
               key={item.id}
               className="phase-tile"
+              aria-label={item.title}
               style={{ animationDelay: `${i * 40 + 60}ms` }}
               onClick={() => dismiss(item.action)}
             >
