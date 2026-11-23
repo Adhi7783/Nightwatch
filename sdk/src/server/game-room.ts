@@ -4,6 +4,7 @@ import type { Env } from '../../worker'
 import type { Game, Profile, PublicGame, Member, Theory } from '../game/types'
 import { validateTheory, matchesSolution, sameConclusion } from '../game/rules'
 import { clues, suspects, locations, methods, motives, answer, reveal } from './case'
+import { briefingHistory } from '../game/briefing-state'
 
 const deny = { read: false, create: false, update: false, delete: false }
 const admin = { read: true, create: true, update: true, delete: true }
@@ -111,6 +112,7 @@ export class Board extends RecordRoom<Env> {
       if (!p) {
         p = { id: b.who.id, name: '', rooms: [], closed: [], created: Date.now() }
       }
+      p.briefedRooms = briefingHistory(p)
       if (b.name !== undefined) {
         if (typeof b.name !== 'string' || b.name.trim().length < 2 || b.name.trim().length > 24)
           fail(400, 'Use a detective name between 2 and 24 characters.')
@@ -118,7 +120,8 @@ export class Board extends RecordRoom<Env> {
       }
       if (b.room && !p.rooms.includes(b.room)) p.rooms = [b.room, ...p.rooms].slice(0, 30)
       if (b.award && !p.closed.includes(b.award)) p.closed.push(b.award)
-      if (b.briefingSeen === true) p.briefingSeen = true
+      if (typeof b.briefedRoom === 'string' && !p.briefedRooms.includes(b.briefedRoom))
+        p.briefedRooms = [b.briefedRoom, ...p.briefedRooms].slice(0, 100)
       await this.put('profiles', p.id, p)
       return Response.json({ profile: p })
     }

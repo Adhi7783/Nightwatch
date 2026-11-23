@@ -2,6 +2,10 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'rea
 import { AuthOverlay, useAuth, getAuthToken, signOut } from 'deepspace'
 import type { Profile, PublicGame, Dossier, Evidence, Theory } from './types'
 import { Machinery, Briefing, type Speech } from './CommandVisuals'
+import { Hologram } from './Hologram'
+import { Wordmark as Brand, PhaseMenu, type CommandDestination } from './CommandNavigation'
+import { BriefingAudio } from './BriefingAudio'
+import { needsBriefing } from './briefing-state'
 
 type Page =
   | 'mission'
@@ -89,22 +93,6 @@ function Modal({
     </dialog>
   )
 }
-function Brand({ onClick, expanded }: { onClick?: () => void; expanded?: boolean }) {
-  return (
-    <button
-      className="brand text-btn"
-      onClick={onClick}
-      aria-label="Nightwatch Forensic Command"
-      aria-expanded={expanded}
-      aria-controls={onClick ? 'command-navigation' : undefined}
-    >
-      <span className="brandmark">N</span>
-      <span>
-        NIGHTWATCH<small>FORENSIC COMMAND</small>
-      </span>
-    </button>
-  )
-}
 function Heading({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="heading">
@@ -153,13 +141,6 @@ export default function Nightwatch() {
     evidenceCount: number
   } | null>(null)
   const [reportUrl, setReportUrl] = useState('')
-  useEffect(() => {
-    const close = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
-    window.addEventListener('keydown', close)
-    return () => window.removeEventListener('keydown', close)
-  }, [])
 
   async function openRoom(code: string, join = false) {
     setError('')
@@ -179,6 +160,7 @@ export default function Nightwatch() {
     if (!auth.isLoaded) return
     const epoch = ++generation.current
     if (!auth.isSignedIn) {
+      setMenuOpen(false)
       setProfile(null)
       setGame(null)
       setDossier(null)
@@ -331,6 +313,45 @@ export default function Nightwatch() {
   }
   const locked = busy || game?.status !== 'investigating'
   const self = game?.members.find((m) => m.id === profile?.id)
+  const destinations: CommandDestination[] = (Object.keys(titles) as Page[])
+    .filter((p) => p === 'mission' || (game && (p === 'overview' || game.status !== 'waiting')))
+    .map((p) => ({
+      id: p,
+      title: p === 'overview' && game?.status === 'waiting' ? 'Case lobby' : titles[p],
+      detail: p === 'mission' ? 'YOUR INVESTIGATION ARCHIVE' : 'PRIVATE CASE / 001',
+      action: () => {
+        if (p === 'mission') mission()
+        else setPage(p)
+      },
+    }))
+  if (!game)
+    destinations.push(
+      {
+        id: 'create',
+        title: 'Start a private case',
+        detail: 'OPEN AN ORIGINAL MYSTERY',
+        action: () =>
+          void perform(async () => {
+            const g = await api<PublicGame>('create', {})
+            await openRoom(g.code)
+          }),
+      },
+      {
+        id: 'join',
+        title: 'Join investigation',
+        detail: 'ENTER A PRIVATE INVITATION',
+        action: () => setModal('join'),
+      },
+    )
+  destinations.push({
+    id: 'profile',
+    title: 'Detective identity',
+    detail: profile?.name || 'YOUR PROFILE',
+    action: () => {
+      setName(profile?.name || '')
+      setModal('profile')
+    },
+  })
   if (!auth.isLoaded || !loaded)
     return (
       <div className="boot" role="status">
@@ -340,15 +361,38 @@ export default function Nightwatch() {
   if (!auth.isSignedIn)
     return (
       <>
-        <link rel="stylesheet" href="/nightwatch.css" />
-        <link rel="stylesheet" href="/command.css" />
         <Machinery />
         <header className="lobby-header">
-          <Brand />
+          <Brand onClick={() => setMenuOpen(true)} expanded={menuOpen} />
           <span className="eyebrow">A CASE FOR TWO</span>
         </header>
+        {menuOpen && (
+          <PhaseMenu
+            onClose={() => setMenuOpen(false)}
+            items={[
+              {
+                id: 'access',
+                title: 'Access Nightwatch',
+                detail: 'SIGN IN TO YOUR DETECTIVE PROFILE',
+                action: () =>
+                  document
+                    .getElementById('player-access')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+              },
+              {
+                id: 'case',
+                title: 'The museum heist',
+                detail: 'EXPLORE YOUR FIRST CASE',
+                action: () =>
+                  document
+                    .getElementById('case-introduction')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+              },
+            ]}
+          />
+        )}
         <main className="lobby-main">
-          <div className="lobby-hero">
+          <div className="lobby-hero" id="case-introduction">
             <div className="lobby-copy">
               <span className="eyebrow">CASE 001 / THE MIDNIGHT MUSEUM HEIST</span>
               <h1>
@@ -366,23 +410,23 @@ export default function Nightwatch() {
               </div>
             </div>
             <div className="lobby-art">
-              <img src="/meridian.svg" alt="The Glass Meridian astronomical instrument" />
+              <Hologram scene="meridian" />
             </div>
           </div>
-          <AuthOverlay providers={['github', 'google']} />
+          <div id="player-access">
+            <AuthOverlay providers={['github', 'google']} />
+          </div>
           {error && <p role="alert">{error}</p>}
         </main>
       </>
     )
-  if (profile?.name && game && !profile.briefingSeen)
+  if (needsBriefing(profile, game))
     return (
       <>
-        <link rel="stylesheet" href="/nightwatch.css" />
-        <link rel="stylesheet" href="/command.css" />
         <Briefing
           load={() => api<Speech>('briefing', {})}
           complete={async () => {
-            const p = await api<{ profile: Profile }>('briefing-seen', {})
+            const p = await api<{ profile: Profile }>('briefing-seen', {}, game!.code)
             setProfile(p.profile)
           }}
         />
@@ -390,9 +434,7 @@ export default function Nightwatch() {
     )
   return (
     <>
-      <link rel="stylesheet" href="/nightwatch.css" />
-      <link rel="stylesheet" href="/command.css" />
-      {(!profile?.name || game?.status === 'waiting') && <Machinery />}
+      <Machinery />
       <header className="command-header">
         <span className="header-system">
           N/W OS <i /> SECURE
@@ -422,49 +464,15 @@ export default function Nightwatch() {
           </button>
         </div>
       </header>
-      {menuOpen && (
-        <button
-          className="nav-shade"
-          aria-label="Close navigation"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
+      {menuOpen && <PhaseMenu onClose={() => setMenuOpen(false)} items={destinations} />}
       <div className="shell">
-        {menuOpen && (
-          <aside className="rail" id="command-navigation">
-            <div className="rail-label">COMMAND DIRECTORY</div>
-            <nav className="nav" aria-label="Nightwatch">
-              {(Object.keys(titles) as Page[])
-                .filter((p) => p === 'mission' || (game && game.status !== 'waiting'))
-                .map((p, i) => (
-                  <button
-                    key={p}
-                    className={page === p ? 'active' : ''}
-                    aria-current={page === p ? 'page' : undefined}
-                    onClick={() => {
-                      if (p === 'mission') mission()
-                      else setPage(p)
-                      setMenuOpen(false)
-                    }}
-                  >
-                    <span className="nav-index">0{i + 1}</span>
-                    {titles[p]}
-                  </button>
-                ))}
-            </nav>
-            <p className="directory-hint">
-              SELECT A DESTINATION
-              <br />
-              ESC TO CLOSE
-            </p>
-          </aside>
-        )}
         <div>
-          <header className="topbar">
+          <header className={'topbar' + (!game ? ' topbar-idle' : '')}>
             <span className="eyebrow">{titles[page]}</span>
             <div className="top-actions">
               {game && (
                 <>
+                  <BriefingAudio key={game.code} load={() => api<Speech>('briefing', {})} />
                   <span className="live">
                     <i className={'dot ' + (live ? '' : 'off')} />
                     {live ? 'Connected' : 'Reconnecting…'}
@@ -520,9 +528,11 @@ export default function Nightwatch() {
               </div>
             ) : page === 'mission' ? (
               <>
-                <Heading title="Mission Control.">
-                  One complete case. A partner if you need one.
-                </Heading>
+                <div className="mission-intro">
+                  <Heading title="Mission Control">
+                    One complete case. A partner if you need one.
+                  </Heading>
+                </div>
                 <section className="case-hero">
                   <div className="hero-copy">
                     <span className="eyebrow">CASE 001 / HAND-AUTHORED MYSTERY</span>
@@ -556,7 +566,7 @@ export default function Nightwatch() {
                     </div>
                   </div>
                   <div className="hero-art">
-                    <img src="/meridian.svg" alt="The Glass Meridian in a museum gallery" />
+                    <Hologram scene="meridian" />
                   </div>
                 </section>
                 <section className="panel">

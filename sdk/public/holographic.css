@@ -1,0 +1,283 @@
+@font-face {
+  font-family: Orbitron;
+  src: url('/fonts/orbitron-variable.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root { --display: Orbitron, 'Bahnschrift', sans-serif; }
+
+/* Geometry moves behind the readable, translucent case surfaces. */
+.machinery {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse at 65% 44%, #07345629, transparent 73%);
+  overflow: hidden;
+  pointer-events: none;
+}
+.machinery .machine-grid { opacity: .5; background-size: 60px 60px; }
+.hologram { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.hologram canvas { display: block; width: 100%; height: 100%; }
+.hologram canvas[hidden] { display: none !important; }
+.hologram-fallback { position: absolute; inset: 0; }
+.machinery > .hologram {
+  position: absolute;
+  inset: 0;
+  opacity: .78;
+  filter: drop-shadow(0 0 3px #1787ca2e);
+}
+.holo-reticle {
+  position: absolute;
+  border: 1px solid #4bb0ef24;
+  border-radius: 50%;
+  box-shadow: 0 0 0 9px #2a7bb810, inset 0 0 0 5px #2a7bb80c;
+  opacity: .5;
+  animation: reticle-orbit 48s linear infinite;
+}
+.holo-reticle::before, .holo-reticle::after {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 1px dashed #439ee94a;
+}
+.holo-reticle::after { inset: -8%; border: 1px solid #439ee926; border-right-color: #78c6ff66; }
+.reticle-a { width: 130px; height: 130px; left: 4%; top: 22%; }
+.reticle-b { width: 90px; height: 90px; right: 5%; bottom: 12%; animation-direction: reverse; }
+.shell, .lobby-main { position: relative; z-index: 1; }
+.command-header, .lobby-header { background: linear-gradient(#020609eb, #020609ad); }
+.panel, .evidence-card, .suspect, .reveal-head {
+  background: linear-gradient(120deg, #071726e0, #030b13e3);
+  backdrop-filter: blur(5px);
+}
+
+/* The wordmark is deliberately text only. */
+.brand.wordmark {
+  font-family: var(--display);
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .24em;
+  padding: 15px 12px 15px 18px;
+  color: #8bcfffda;
+  text-shadow: 0 0 22px #3a9bdf3b;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  gap: 0;
+}
+.brand.wordmark:not(:disabled):hover {
+  color: #c1e7ff;
+  text-shadow: 0 0 13px #67bfff8c, 0 0 35px #2389d14d;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.wordmark span { display: block; }
+.header-account .text-btn { font-family: var(--display); font-size: 9px; letter-spacing: .1em; }
+.header-system { opacity: .7; }
+
+.topbar-idle { display: none; }
+.mission-intro { text-align: center; margin: 12px auto 38px; }
+.mission-intro .heading { display: block; margin: 0; }
+.mission-intro .eyebrow {
+  color: #69baffb8;
+  font: 9px var(--display);
+  letter-spacing: .27em;
+}
+.mission-intro .heading h1 {
+  color: #75c7ffdb;
+  font: 500 clamp(26px, 3.5vw, 44px)/1.4 var(--display);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin: 15px 0 14px;
+  text-shadow: 0 0 26px #399fe835;
+}
+.mission-intro .heading p {
+  color: #69baffbf;
+  font: 400 10px/1.9 var(--display);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.case-hero {
+  background: linear-gradient(100deg, #030b13eb, #02080d88);
+  grid-template-columns: 1.1fr 1fr;
+  min-height: 420px;
+}
+.hero-copy { background: linear-gradient(100deg, #030c14b3, #02080d29); padding: 38px; }
+.hero-copy h2 {
+  font-family: var(--display);
+  font-size: clamp(27px, 2.5vw, 36px);
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: .025em;
+  margin: 22px 0;
+}
+.hero-copy h2 em { color: #72c4ffc9; }
+.hero-art, .lobby-art {
+  background: transparent !important;
+  border: 0;
+  overflow: hidden;
+  min-height: 420px;
+  isolation: isolate;
+}
+.hero-art::before, .hero-art::after, .lobby-art::before, .lobby-art::after { display: none; content: none; }
+.hero-art > .hologram, .lobby-art > .hologram {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 4px #51b9ff55) drop-shadow(0 0 15px #1478d22e);
+}
+.case-hero .btn, .lobby-orbits .btn { font-family: var(--display); font-size: 10px; letter-spacing: .035em; }
+.case-hero .btn { padding: 13px 16px; }
+.panel-title { font-family: var(--display); font-size: 16px; line-height: 1.6; }
+.heading h1 { color: #a9d9facf; }
+.case-lobby > p { background: #02090e75; border-radius: 6px; padding: 16px 20px; backdrop-filter: blur(2px); }
+.main:has(.case-lobby) .heading h1 { font-family: var(--display); font-size: clamp(24px, 3vw, 36px); line-height: 1.4; }
+
+/* Full-screen navigation phases into place without a side panel. */
+dialog.phase-menu {
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 28px 5vw 25px;
+  border: 0;
+  background: radial-gradient(ellipse at 50% 45%, #0a2d4652, #01050940 75%);
+  color: #8ecbff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  animation: phase-arrive .36s ease both;
+}
+dialog.phase-menu[open] { display: grid; place-items: center; }
+.phase-menu::backdrop {
+  background: #01060cc2;
+  backdrop-filter: blur(13px) brightness(.48);
+  animation: phase-background .4s ease both;
+}
+.phase-shell { width: min(1040px, 100%); margin: auto; }
+.phase-header { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; }
+.phase-header .wordmark { font-size: 28px; }
+.phase-close { position: absolute; right: 0; top: 50%; translate: 0 -50%; border: 1px solid #6cbdff40; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; color: #87c6f8; }
+.phase-heading { text-align: center; margin-bottom: 37px; }
+.phase-heading .eyebrow { font-family: var(--display); font-size: 9px; letter-spacing: .3em; color: #438cc1; }
+.phase-heading h2 { font: 400 clamp(21px, 2.9vw, 34px)/1.5 var(--display); color: #7cc3f8b8; text-shadow: 0 0 24px #278de644; letter-spacing: .05em; margin: 14px 0 0; }
+.phase-destinations { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.phase-tile {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+  min-height: 100px;
+  padding: 22px 24px;
+  border: 1px solid #63b8f54d;
+  border-radius: 15px;
+  background: linear-gradient(120deg, #144b7329, #0a223b1f);
+  box-shadow: inset 0 0 30px #12578d13, 0 0 30px #103e7b0b;
+  color: #81c4f6c9;
+  animation: phase-option .5s cubic-bezier(.2, .75, .2, 1) both;
+}
+.phase-tile > span:nth-child(2) { flex: 1; }
+.phase-tile strong { display: block; font: 400 clamp(17px, 1.85vw, 24px)/1.45 var(--display); letter-spacing: .02em; text-shadow: 0 0 20px #3a9df54d; }
+.phase-tile small { display: block; margin-top: 9px; font: 8px var(--mono); letter-spacing: .2em; color: #5281a7; }
+.phase-number { font: 10px var(--mono); color: #42799f; align-self: flex-start; padding-top: 8px; }
+.phase-arrow { color: #4d94c7; font-size: 24px; }
+.phase-tile:not(:disabled):hover { transform: scale(1.02); background: #226ba740; border-color: #8dcfffbd; box-shadow: inset 0 0 30px #2d8cc91f, 0 0 33px #216eac35; color: #c0e5ff; }
+.phase-hint { display: flex; justify-content: space-between; margin: 27px 4px 0; font: 8px var(--mono); letter-spacing: .22em; color: #40769a; }
+.phase-menu.is-closing { animation: phase-depart .23s ease both; }
+.phase-menu.is-closing::backdrop { animation: phase-background-out .23s ease both; }
+.phase-menu.is-closing .phase-tile { animation: none; }
+
+.briefing-replay { position: relative; }
+.briefing-replay-button {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 33px;
+  border: 1px solid #438fc645;
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: #76b8e4bf;
+  background: #0a294127;
+  font: 8px var(--display);
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+.briefing-replay-button[aria-pressed='true'] { color: #afe1ff; border-color: #8dd2ff96; box-shadow: 0 0 20px #3ba1ea20; }
+.briefing-replay audio { display: none; }
+.briefing-replay > small { position: absolute; top: 100%; right: 0; z-index: 3; padding: 8px; min-width: 200px; font-size: 10px; background: #06111df5; color: #a8cce6; border: 1px solid #3977a255; }
+.topbar { min-height: 62px; height: auto; }
+.topbar > .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top-actions { flex-shrink: 0; }
+.briefing-screen { background: #010305; }
+.briefing-screen .spoken-text { font-family: var(--display); font-size: clamp(21px, 2.4vw, 33px); line-height: 1.85; letter-spacing: .025em; }
+.spoken-text .transmission-word { display: inline-block; white-space: pre; opacity: 1; }
+.transmission-word > span { opacity: 0; color: #6fbfffce; transition: opacity .08s linear; }
+.transmission-word > span.spoken { opacity: 1; }
+.briefing-brand-header { justify-content: normal; }
+.briefing-screen .phase-menu { z-index: 120; }
+
+@keyframes reticle-orbit { to { rotate: 360deg; } }
+@keyframes phase-arrive { from { opacity: 0; transform: scale(1.025); filter: blur(7px); } to { opacity: 1; transform: scale(1); filter: blur(0); } }
+@keyframes phase-option { from { opacity: 0; translate: 0 13px; filter: blur(6px); } to { opacity: 1; translate: 0 0; filter: blur(0); } }
+@keyframes phase-background { from { background: #01060c00; backdrop-filter: blur(0) brightness(1); } to { background: #01060cc2; backdrop-filter: blur(13px) brightness(.48); } }
+@keyframes phase-depart { to { opacity: 0; transform: scale(.975); filter: blur(8px); } }
+@keyframes phase-background-out { to { background: #01060c00; backdrop-filter: blur(0) brightness(1); } }
+
+@media (min-width: 1600px) { .hero-art { min-height: 460px; } .hero-copy { padding: 46px; } }
+@media (max-width: 850px) {
+  .brand.wordmark { font-size: 23px; letter-spacing: .2em; }
+  .hero-copy { padding: 30px; }
+  .hero-copy h2 { font-size: 26px; }
+  .hero-art { min-height: 410px; }
+  .phase-tile { gap: 14px; padding: 19px; }
+  .phase-tile strong { font-size: 18px; }
+  .phase-header { margin-bottom: 28px; }
+  .top-actions { gap: 10px; }
+}
+@media (max-width: 560px) {
+  .brand.wordmark { font-size: 22px; letter-spacing: .18em; padding: 13px 10px 13px 15px; }
+  .header-account .text-btn { font-size: 8px; }
+  .mission-intro { margin: 10px auto 31px; }
+  .mission-intro .heading .eyebrow { font-size: 7px; letter-spacing: .18em; white-space: normal; }
+  .mission-intro .heading h1 { font-size: clamp(22px, 6.2vw, 28px); letter-spacing: .07em; margin: 14px 0 12px; }
+  .mission-intro .heading p { font-size: 8px; letter-spacing: .08em; line-height: 2; }
+  .case-hero { grid-template-columns: 1fr; }
+  .hero-copy { padding: 26px; }
+  .hero-copy h2 { font-size: 27px; line-height: 1.4; }
+  .hero-art { height: 325px; min-height: 325px; order: 0; }
+  .lobby-art { height: 330px; min-height: 330px; }
+  .hero-copy .actions-row { gap: 12px; }
+  .reticle-a { width: 90px; height: 90px; left: -20px; top: 32%; }
+  .reticle-b { width: 65px; height: 65px; right: -20px; bottom: 12%; }
+  .topbar { min-height: 58px; gap: 10px; }
+  .top-actions { gap: 8px; }
+  .topbar > .eyebrow { max-width: 90px; font-size: 7px; letter-spacing: 1px; }
+  .briefing-replay-button { font-size: 7px; padding: 7px 8px; gap: 6px; }
+  .room-pill { font-size: 8px; padding: 8px; }
+  dialog.phase-menu { padding: 20px; }
+  .phase-header { margin: 0 0 28px; padding-right: 0; }
+  .phase-header .wordmark { font-size: 20px; }
+  .phase-close { width: 30px; height: 30px; font-size: 20px; right: -6px; }
+  .phase-heading { margin-bottom: 25px; }
+  .phase-heading .eyebrow { font-size: 7px; }
+  .phase-heading h2 { font-size: 20px; }
+  .phase-destinations { grid-template-columns: 1fr; gap: 12px; }
+  .phase-tile { min-height: 74px; padding: 16px; border-radius: 12px; gap: 14px; }
+  .phase-tile strong { font-size: 16px; }
+  .phase-tile small { font-size: 7px; margin-top: 6px; }
+  .phase-number { font-size: 8px; padding-top: 4px; }
+  .phase-arrow { font-size: 20px; }
+  .phase-hint { font-size: 7px; letter-spacing: 1px; margin-top: 22px; }
+  .briefing-screen .spoken-text { font-size: 19px; line-height: 1.85; min-height: 390px; }
+  .briefing-brand-header { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .holo-reticle, .phase-menu, .phase-menu::backdrop, .phase-tile { animation: none !important; transition: none !important; }
+}

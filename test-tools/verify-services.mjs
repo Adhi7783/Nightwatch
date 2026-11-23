@@ -36,8 +36,11 @@ if (narration.status !== 200) throw Error(JSON.stringify({ feature: 'briefing', 
 check('ElevenLabs returns actual audio and character timing', narration.data.audioUrl.startsWith('data:audio/') && narration.data.alignment.characters.length > 100 && narration.data.alignment.character_start_times_seconds.every(Number.isFinite))
 await fs.writeFile('test-artifacts/briefing.mp3', Buffer.from(narration.data.audioUrl.split(',')[1], 'base64'))
 check('Narration is reused from the durable cache', (await api(host, 'briefing', {})).data.audioUrl === narration.data.audioUrl)
-await api(host, 'briefing-seen', {})
-check('One-time briefing completion persists to the account', (await api(host, 'profile')).data.profile.briefingSeen === true)
+check('Nonmembers cannot mark another room briefing complete', (await api(outsider, 'briefing-seen', {}, code)).status === 403)
+await api(host, 'briefing-seen', {}, code)
+check('Briefing completion persists for this case', (await api(host, 'profile')).data.profile.briefedRooms.includes(code))
+const second = (await api(host, 'create', {})).data.code
+check('A new case does not inherit a completed briefing', !(await api(host, 'profile')).data.profile.briefedRooms.includes(second))
 await api(host, 'start', {}, code)
 for (const id of ['seal', 'mold', 'order', 'ledger']) await api(host, 'share', { id }, code)
 const room = (await api(host, 'room', undefined, code)).data

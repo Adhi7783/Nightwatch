@@ -1,67 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Hologram } from './Hologram'
+import { Wordmark, PhaseMenu } from './CommandNavigation'
 
 export function Machinery() {
   return (
     <div className="machinery" aria-hidden="true">
       <div className="machine-grid" />
-      <svg className="machine-engine" viewBox="0 0 1200 760" fill="none">
-        <g className="engine-axis" stroke="currentColor">
-          <path d="M110 380H1090M600 65V695" strokeDasharray="2 12" />
-          {[0, 1, 2, 3, 4].map((i) => (
-            <g key={i} transform={`translate(${260 + i * 170} 380)`}>
-              <g className={'machine-rotor rotor-' + i}>
-                <ellipse rx={94 + i * 5} ry={195 - i * 12} />
-                <ellipse rx={81 + i * 5} ry={177 - i * 12} strokeDasharray="2 5" />
-                <ellipse rx={65 + i * 4} ry={149 - i * 10} />
-                {Array.from({ length: 24 }, (_, n) => (
-                  <path
-                    key={n}
-                    d="M0 -183L5 -156L-5 -150Z"
-                    transform={`rotate(${n * 15}) scale(.52 1)`}
-                  />
-                ))}
-                <ellipse rx="25" ry="52" />
-                <path d="M-70 -135L70 135M70 -135L-70 135" opacity=".4" />
-              </g>
-            </g>
-          ))}
-          {[0, 1, 2, 3].map((i) => (
-            <g key={i} opacity=".4">
-              <path
-                d={`M${260 + i * 170} 205L${430 + i * 170} 217M${260 + i * 170} 555L${430 + i * 170} 543`}
-              />
-              <path
-                d={`M${260 + i * 170} 280L${430 + i * 170} 290M${260 + i * 170} 480L${430 + i * 170} 470`}
-                strokeDasharray="5 7"
-              />
-            </g>
-          ))}
-        </g>
-        <g className="machine-dial" stroke="currentColor" transform="translate(190 560)">
-          <circle r="100" strokeDasharray="110 14 5 14" />
-          <circle r="85" strokeDasharray="2 5" />
-          <circle r="64" />
-          <circle r="57" strokeDasharray="3 8" />
-          <path d="M-115 0H115M0 -115V115" />
-        </g>
-        <g stroke="currentColor" opacity=".45">
-          <path d="M70 90H330L365 120H505M850 630H1100V510M80 630H390M870 100H1100V250" />
-          <path
-            d="M84 110H270M84 118H240M84 126H285M920 610H1080M950 600H1080"
-            strokeDasharray="2 4"
-          />
-        </g>
-      </svg>
-      <span className="machine-label label-a">
-        N/W SYSTEMS
-        <br />
-        ROTATIONAL ARRAY / ACTIVE
-      </span>
-      <span className="machine-label label-b">
-        SECURE ENVIRONMENT
-        <br />
-        FORENSIC COMMAND 001
-      </span>
+      <Hologram scene="machinery" />
+      <div className="holo-reticle reticle-a" />
+      <div className="holo-reticle reticle-b" />
       <div className="scan-line" />
     </div>
   )
@@ -89,17 +36,23 @@ export function Briefing({
     [error, setError] = useState(''),
     [saving, setSaving] = useState(false)
   const audio = useRef<HTMLAudioElement>(null)
+  const mounted = useRef(true)
   const [directory, setDirectory] = useState(false)
   const fetchBrief = async () => {
     setError('')
     try {
-      setSpeech(await load())
+      const result = await load()
+      if (mounted.current) setSpeech(result)
     } catch (e) {
-      setError((e as Error).message)
+      if (mounted.current) setError((e as Error).message)
     }
   }
   useEffect(() => {
+    mounted.current = true
     void fetchBrief()
+    return () => {
+      mounted.current = false
+    }
   }, [])
   useEffect(() => {
     if (!speech) return
@@ -108,6 +61,7 @@ export function Briefing({
     void el.play().catch(() => {
       /* Browsers may require the explicit play button. */
     })
+    return () => el.pause()
   }, [speech])
   async function finish() {
     audio.current?.pause()
@@ -121,17 +75,30 @@ export function Briefing({
       setSaving(false)
     }
   }
-  const characters = speech?.alignment.characters || []
-  let cursor = 0
-  const words =
-    characters
-      .join('')
-      .match(/\S+\s*/g)
-      ?.map((word) => {
-        const index = characters.join('').indexOf(word, cursor)
-        cursor = index + word.length
-        return { word, start: speech!.alignment.character_start_times_seconds[index] ?? 0 }
-      }) || []
+  useEffect(() => {
+    if (!playing) return
+    let frame = 0,
+      last = -1
+    const tick = () => {
+      const t = audio.current?.currentTime || 0
+      if (Math.floor(t * 30) !== last) {
+        last = Math.floor(t * 30)
+        setTime(t)
+      }
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [playing])
+  const words = useMemo(() => {
+    const text = speech?.alignment.characters.join('') || ''
+    let cursor = 0
+    return (text.match(/\S+\s*/g) || []).map((word) => {
+      const start = text.indexOf(word, cursor)
+      cursor = start + word.length
+      return { word, start }
+    })
+  }, [speech])
   return (
     <div
       className="briefing-screen"
@@ -143,42 +110,26 @@ export function Briefing({
         <span className="header-system">
           N/W OS <i /> SECURE
         </span>
-        <button
-          className="brand text-btn"
-          aria-label="Nightwatch Forensic Command"
-          aria-expanded={directory}
-          aria-controls="briefing-directory"
-          onClick={() => setDirectory((v) => !v)}
-        >
-          <span className="brandmark">N</span>
-          <span>
-            NIGHTWATCH<small>FORENSIC COMMAND</small>
-          </span>
-        </button>
+        <Wordmark onClick={() => setDirectory(true)} expanded={directory} />
       </header>
       {directory && (
-        <>
-          <button
-            className="nav-shade"
-            aria-label="Close navigation"
-            onClick={() => setDirectory(false)}
-          />
-          <aside className="rail briefing-directory" id="briefing-directory">
-            <div className="rail-label">COMMAND DIRECTORY</div>
-            <button
-              className="btn ghost"
-              onClick={() => {
-                setDirectory(false)
-                void finish()
-              }}
-            >
-              Continue to case
-            </button>
-            <button className="text-btn" onClick={() => setDirectory(false)}>
-              Return to transmission
-            </button>
-          </aside>
-        </>
+        <PhaseMenu
+          onClose={() => setDirectory(false)}
+          items={[
+            {
+              id: 'transmission',
+              title: 'Return to transmission',
+              detail: 'CONTINUE LISTENING',
+              action: () => {},
+            },
+            {
+              id: 'case',
+              title: 'Enter investigation',
+              detail: 'CONTINUE TO YOUR CASE',
+              action: () => void finish(),
+            },
+          ]}
+        />
       )}
       <div className="briefing-top">
         <span className="eyebrow">INCOMING TRANSMISSION / CASE 001</span>
@@ -192,8 +143,19 @@ export function Briefing({
         {speech ? (
           <p className="spoken-text" aria-label={speech.text}>
             {words.map((w, i) => (
-              <span key={i} aria-hidden="true" className={time >= w.start ? 'spoken' : ''}>
-                {w.word}
+              <span className="transmission-word" key={i} aria-hidden="true">
+                {w.word.split('').map((character, j) => (
+                  <span
+                    key={j}
+                    className={
+                      time >= (speech.alignment.character_start_times_seconds[w.start + j] ?? 0)
+                        ? 'spoken'
+                        : ''
+                    }
+                  >
+                    {character}
+                  </span>
+                ))}
               </span>
             ))}
           </p>

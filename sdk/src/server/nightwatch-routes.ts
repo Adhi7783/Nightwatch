@@ -53,8 +53,6 @@ export function registerNightwatchRoutes(app: Hono<AppContext>) {
     const { profile } = (await p.json()) as { profile: Profile }
     if (action === 'profile') return c.json({ profile })
     if (!profile.name) return c.json({ error: 'Choose a detective name first.' }, 409)
-    if (action === 'briefing-seen' && req.method === 'POST')
-      return internal(global, 'profile', { who: profile, briefingSeen: true })
     if (action === 'briefing' && req.method === 'POST')
       return feature(c.env, global, profile, 'briefing')
     if (action === 'create' && req.method === 'POST') {
@@ -70,6 +68,11 @@ export function registerNightwatchRoutes(app: Hono<AppContext>) {
     if (!/^[A-F0-9]{12}$/.test(code))
       return c.json({ error: 'Use the 12-character invitation code.' }, 400)
     const room = c.env.BOARD.get(c.env.BOARD.idFromName('nightwatch:v2:room:' + code))
+    if (action === 'briefing-seen' && req.method === 'POST') {
+      const gate = await internal(room, 'room', { who: profile })
+      if (!gate.ok) return gate
+      return internal(global, 'profile', { who: profile, briefedRoom: code })
+    }
     if (['recap', 'report'].includes(action) && req.method === 'POST') {
       const gate = await internal(room, 'room', { who: profile })
       if (!gate.ok) return gate

@@ -9,6 +9,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/orbitron-variable.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="stylesheet" href="/nightwatch.css" />
+    <link rel="stylesheet" href="/command.css" />
+    <link rel="stylesheet" href="/holographic.css" />
     <title>Nightwatch</title>
     <!--
       First-paint background, keyed to the data-theme attribute above.
@@ -26,6 +30,7 @@
         background-color: #ffffff;
         color-scheme: light;
       }
+      html[data-theme='nightwatch'] { background-color: #020507; }
       /* Add one line per theme you create, mirroring its --color-background. */
     </style>
   </head>
