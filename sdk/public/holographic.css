@@ -215,7 +215,10 @@ dialog.phase-menu[open] { display: grid; place-items: center; }
 .topbar { min-height: 62px; height: auto; }
 .topbar > .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top-actions { flex-shrink: 0; }
-.briefing-screen { background: #010305; }
+.briefing-screen { background: #010305; overflow: hidden; }
+.briefing-top { flex-shrink: 0; }
+.briefing-content { flex: 1; min-height: 0; overflow-y: auto; margin: 0 auto; scrollbar-width: thin; scrollbar-color: #3e84b94d transparent; }
+.briefing-controls { flex-shrink: 0; max-height: 40svh; overflow-y: auto; }
 .briefing-screen .spoken-text { font-family: var(--display); font-size: clamp(21px, 2.4vw, 33px); line-height: 1.85; letter-spacing: .025em; }
 .spoken-text .transmission-word { display: inline-block; white-space: pre; opacity: 1; }
 .transmission-word > span { opacity: 0; color: #6fbfffce; transition: opacity .08s linear; }

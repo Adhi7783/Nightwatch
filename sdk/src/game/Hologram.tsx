@@ -23,7 +23,8 @@ varying float v_height;
 void main() {
   float sweep = exp(-pow((v_height - mod(u_time * 0.42, 5.5) + 2.75) * 8.0, 2.0));
   vec3 blue = mix(vec3(0.22, 0.62, 0.94), vec3(0.65, 0.9, 1.0), v_depth * 0.65 + sweep * 0.3);
-  gl_FragColor = vec4(blue, u_alpha * v_depth * (0.82 + sweep * 0.18));
+  float opacity = u_alpha * v_depth * (0.82 + sweep * 0.18);
+  gl_FragColor = vec4(blue * opacity, opacity);
 }`
 
 /** Real perspective-projected geometry. No bitmap, model service or external engine. */
@@ -65,7 +66,7 @@ export function Hologram({ scene, className = '' }: { scene: HologramScene; clas
         alpha: true,
         antialias: true,
         depth: false,
-        premultipliedAlpha: false,
+        premultipliedAlpha: true,
         powerPreference: 'low-power',
       })
       resources = gl
@@ -94,7 +95,7 @@ export function Hologram({ scene, className = '' }: { scene: HologramScene; clas
         clock = gl.getUniformLocation(program, 'u_time')
         gl.enableVertexAttribArray(position)
         gl.enable(gl.BLEND)
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE)
+        gl.blendFunc(gl.ONE, gl.ONE)
         gl.clearColor(0, 0, 0, 0)
         for (const part of parts) {
           const buffer = gl.createBuffer()!

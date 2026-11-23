@@ -37,6 +37,7 @@ export function Briefing({
     [saving, setSaving] = useState(false)
   const audio = useRef<HTMLAudioElement>(null)
   const mounted = useRef(true)
+  const currentWord = useRef<HTMLSpanElement>(null)
   const [directory, setDirectory] = useState(false)
   const fetchBrief = async () => {
     setError('')
@@ -99,6 +100,19 @@ export function Briefing({
       return { word, start }
     })
   }, [speech])
+  const activeWord = words.reduce(
+    (last, w, i) =>
+      time >= (speech?.alignment.character_start_times_seconds[w.start] ?? Infinity) ? i : last,
+    -1,
+  )
+  useEffect(() => {
+    if (activeWord < 0) return
+    currentWord.current?.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    })
+  }, [activeWord])
   return (
     <div
       className="briefing-screen"
@@ -143,7 +157,12 @@ export function Briefing({
         {speech ? (
           <p className="spoken-text" aria-label={speech.text}>
             {words.map((w, i) => (
-              <span className="transmission-word" key={i} aria-hidden="true">
+              <span
+                className="transmission-word"
+                key={i}
+                aria-hidden="true"
+                ref={i === activeWord ? currentWord : undefined}
+              >
                 {w.word.split('').map((character, j) => (
                   <span
                     key={j}

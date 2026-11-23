@@ -21,6 +21,8 @@ jobs:
         run: npm run test:rules
       - name: Validate TypeScript and build
         run: npm run build
+      - name: Build isolated visual fixture
+        run: npx vite build --config tests/visual-preview/vite.config.ts
       - name: Preserve compiled Worker and web assets
         uses: actions/upload-artifact@v4
         with:
