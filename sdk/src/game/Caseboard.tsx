@@ -653,7 +653,9 @@ export function Caseboard({
               {ids.map((id) => card(id, true))}
             </div>
             <span className="board-pan-hint">
-              Drag empty space to pan · Drag a card header to arrange · Drag ⊕ to connect
+              {closed
+                ? 'Archived caseboard · Select a card or connection to read'
+                : 'Drag empty space to pan · Drag a card header to arrange · Drag ⊕ to connect'}
             </span>
           </div>
         )}
@@ -671,7 +673,13 @@ export function Caseboard({
           {connect || link ? (
             <>
               <span className="eyebrow">INVESTIGATOR THEORY</span>
-              <h2>{link ? 'Edit connection' : 'Connect the evidence'}</h2>
+              <h2>
+                {link
+                  ? closed
+                    ? 'Connection details'
+                    : 'Edit connection'
+                  : 'Connect the evidence'}
+              </h2>
               <p>{title(link?.source || connect!.source)}</p>
               <form
                 onSubmit={(e) => {

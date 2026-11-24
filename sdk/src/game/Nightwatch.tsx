@@ -311,17 +311,14 @@ export default function Nightwatch() {
   }
   const locked = busy || game?.status !== 'investigating'
   const self = game?.members.find((m) => m.id === profile?.id)
-  const destinations: CommandDestination[] = (Object.keys(titles) as Page[])
-    .filter((p) => p === 'mission' || (game && (p === 'overview' || game.status !== 'waiting')))
-    .map((p) => ({
-      id: p,
-      title: p === 'overview' && game?.status === 'waiting' ? 'Case lobby' : titles[p],
-      detail: p === 'mission' ? 'YOUR INVESTIGATION ARCHIVE' : 'PRIVATE CASE / 001',
-      action: () => {
-        if (p === 'mission') mission()
-        else setPage(p)
-      },
-    }))
+  const destinations: CommandDestination[] = [
+    {
+      id: 'mission',
+      title: 'Mission Control',
+      detail: 'YOUR INVESTIGATION ARCHIVE',
+      action: mission,
+    },
+  ]
   if (!game)
     destinations.push(
       {

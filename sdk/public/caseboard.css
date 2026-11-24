@@ -1,5 +1,5 @@
 /* A focused workspace over Nightwatch's existing moving holographic machinery. */
-.investigation-nav { display:flex; gap:6px; margin:6px auto 8px; padding:7px; max-width:760px; border:1px solid #67bfff2b; background:#030d16de; border-radius:12px; position:relative; z-index:2; }
+.investigation-nav { display:flex; gap:6px; margin:6px auto 8px; padding:7px; max-width:760px; border:1px solid #67bfff2b; background:#030d16f2; border-radius:12px; position:sticky; top:8px; z-index:20; backdrop-filter:blur(12px); }
 .investigation-nav button { flex:1; display:flex; align-items:center; justify-content:center; gap:12px; color:#8caabe; border:1px solid transparent; background:transparent; border-radius:8px; min-height:48px; font-size:14px; cursor:pointer; }
 .investigation-nav button[aria-current] { background:#17649d29; border-color:#68c5ff65; color:#c8ebff; box-shadow:inset 0 0 20px #2077b719; }
 .nav-step { font:9px var(--display); color:#62b9eea6; }
