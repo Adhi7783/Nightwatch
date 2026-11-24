@@ -4,21 +4,21 @@ Production: https://nightwatch-meridian.app.space
 
 Repository: https://github.com/Adhi7783/Nightwatch
 
-Runtime source: eecc4ae3fda33da2e8ad4bbbd8f960f29d0b0284
+Runtime source: 352b86c72a5f7870bf83675ed50bc187a6ac8762
 
-Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/45311139084
+Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/45314796038
 
-Production release: rel_01M85NMKBRPWAZ8XSA2DW44ANF
+Production release: rel_01M85QBFV2K6G1EJ9T8CA80BW2
 
 ## Automated game and integration checks
 
-31 tests passed locally and in CI: 13 authored-case/rule checks, five source-grounded recap checks, four briefing-history/migration checks, three 3D geometry checks and six board concurrency/validation checks. Strict TypeScript, the production build and the isolated visual fixture build passed.
+35 tests passed locally and in CI: 13 authored-case/rule checks, five source-grounded recap checks, four briefing-history/migration checks, three 3D geometry checks and six board concurrency/validation checks. Strict TypeScript, the production build and the isolated visual fixture build passed.
 
-All 65 native-account production checks passed after the caseboard server revision. They include real DeepSpace identity, private membership, host start, a real RecordRoom socket snapshot and broadcast, denied direct socket writes, earned evidence, reviews/pins, concurrent notes, idempotency, malformed and incorrect accusations, joint and solo solves, full reveal, preserved history and native sign-out/sign-in restoration. Board checks include member gating, drag reservations, partner exclusion, durable positions, stale-revision rejection, bounded coordinates, concurrent independent moves, annotation persistence, stale connection edits, reversed duplicate rejection, connection removal/restoration, context-specific notes, undo ownership/conflict rejection, increasing room revisions and immutable closed boards. Existing developer fixture accounts were used; the applicant's personal cases were not used for mutation tests.
+All 72 native-account production checks passed after the caseboard server revision. They include real DeepSpace identity, private membership, host start, a real RecordRoom socket snapshot and broadcast, denied direct socket writes, earned evidence, reviews/pins, concurrent notes, idempotency, malformed and incorrect accusations, joint and solo solves, full reveal, preserved history and native sign-out/sign-in restoration. Board checks include member gating, drag reservations, partner exclusion, durable positions, stale-revision rejection, bounded coordinates, concurrent independent moves, annotation persistence, stale connection edits, reversed duplicate rejection, connection removal/restoration, context-specific notes, undo ownership/conflict rejection, increasing room revisions and immutable closed boards. Existing developer fixture accounts were used; the applicant's personal cases were not used for mutation tests.
 
-All 19 integration checks passed. Actual ElevenLabs audio/timing, durable narration reuse, per-case briefing completion, earned-evidence Anthropic citations, generic paid-proxy rejection, private-room gates and actual CloudConvert PDF download/reuse were verified. The exported fixture contains an annotated connection and a note attached to The unbroken seal. Its three PDF pages were rendered with Poppler and visually inspected, including escaped literal HTML, evidence context, the connection explanation and contributor totals. No confidential source text or arbitrary generation prompt is sent by these features.
+All 20 integration checks passed. Actual ElevenLabs audio/timing, durable narration reuse, per-case briefing completion, earned-evidence Anthropic citations, generic paid-proxy rejection, private-room gates and actual CloudConvert PDF download/reuse were verified. The exported fixture contains an annotated connection and a note attached to The unbroken seal. Its three PDF pages were rendered with Poppler and visually inspected, including escaped literal HTML, evidence context, the connection explanation and contributor totals. No confidential source text or arbitrary generation prompt is sent by these features.
 
-The final subsequent runtime change tightened sticky navigation, reduced phase-menu destinations and clarified archive controls. It did not change the tested server, integration or game rules. The final CI reran all 31 tests and built the published artifact.
+The final subsequent runtime change tightened sticky navigation, reduced phase-menu destinations and clarified archive controls. It did not change the tested server, integration or game rules. The final CI reran all 35 tests and built the published artifact.
 
 ## Browser interaction checks
 
@@ -36,3 +36,7 @@ The preview has no DeepSpace client, identity, game endpoint or persistent write
 - Earlier verification established per-case narration, audio-only replay, full-screen phase navigation and the original rotating 3D geometry. This revision preserves those renderers and the requested moving backgrounds.
 
 Private credentials and downloaded build, narration, PDF and screenshot artifacts remain ignored by Git. The tracked-source secret scan passed. See VISUAL-DIRECTION.md for visual decisions and the isolated preview workflow.
+
+## Save controls and feminine voice revision
+
+Four additional unit tests cover personal archive deletion, idempotent restore, ownership and input validation, and finite duration-preserving PCM encoding. Seven new live checks verified that deleting a save affects only the caller archive, preserves partner saves and shared history, and can be undone without losing case completion. The live new-case prompt and delete confirmation were inspected without deleting any applicant save. The feminine stock Sarah voice is generated through ElevenLabs with high stability, then lightly filtered and modulated in a bounded browser OfflineAudioContext. Browser playback returned processed WAV audio with a finite 27.26-second duration. Its sample count is unchanged, preserving speech alignment. The stock feminine voice remains playable if offline processing is unavailable. The YouTube reference was identified as Arkham Knight Batcomputer voicelines; subjective similarity is not an exact voice-match claim.

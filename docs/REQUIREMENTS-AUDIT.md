@@ -4,7 +4,7 @@ The detailed product brief and exercise text supplied on November 19, 2026 are t
 
 ## Final implementation status
 
-The production app is https://nightwatch-meridian.app.space and its source claim was verified as GitHub repository `adhi7783/nightwatch`. The SDK revision has passed GitHub TypeScript/build validation, 31 game, caseboard, recap, briefing-history and geometry tests, and deployed native-account security/game-flow checks. The applicant confirmed production sign-in and detective-name setup; the saved identity was visible after reload. Signed-in desktop/mobile Mission Control, room creation, invitations and lobby restoration were checked in the browser.
+The production app is https://nightwatch-meridian.app.space and its source claim was verified as GitHub repository `adhi7783/nightwatch`. The SDK revision has passed GitHub TypeScript/build validation, 35 game, caseboard, recap, briefing-history and geometry tests, and deployed native-account security/game-flow checks. The applicant confirmed production sign-in and detective-name setup; the saved identity was visible after reload. Signed-in desktop/mobile Mission Control, room creation, invitations and lobby restoration were checked in the browser.
 
 The original `Nightwatch_Project_Build_Checklist.docx` was located beside the project and its full checklist text was cross-checked against this implementation. The document itself was read, not edited or marked complete on the applicant's behalf.
 

@@ -71,7 +71,7 @@ The main tradeoff is one complete authored case and a bounded thirteen-card canv
 
 ## Verification and submission
 
-GitHub Actions runs 31 game, caseboard concurrency, recap, briefing-history and 3D geometry tests, TypeScript validation and the production build. Live verification covers 65 native game/security/board checks and 19 integration checks, including actual provider responses and a downloaded PDF. See the checked-in verification record for exact release references and execution limits.
+GitHub Actions runs 35 game, caseboard concurrency, recap, briefing-history and 3D geometry tests, TypeScript validation and the production build. Live verification covers 72 native game/security/board checks and 20 integration checks, including actual provider responses and a downloaded PDF. See the checked-in verification record for exact release references and execution limits.
 
 Browser checks cover native sign-in, the applicant's saved detective name, room creation/invitation, reload restoration, and the signed-in 390 px layout. The full solve/security path was tested through real HTTP and independent WebSocket sessions. The complete two-browser UI acceptance specification is provided in `sdk/tests/collab.spec.ts`; do not claim it ran unless recorded.
 
@@ -82,3 +82,5 @@ Browser checks cover native sign-in, the applicant's saved detective name, room 
 - [Interview preparation and debugging decisions](docs/INTERVIEW.md)
 
 The applicant confirmed production sign-in and detective-name setup. Their full personal partner playthrough and portal submission remain their own steps. The deadline is November 23, 2026, 11:59 PM Eastern / 8:59 PM Pacific.
+
+Starting a private case now asks whether to resume an existing saved room or create a new one. Each archive row has Delete with confirmation and Undo; this removes the personal archive entry without deleting a partner’s save or shared investigation.
