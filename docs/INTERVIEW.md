@@ -9,6 +9,10 @@
 5. `sdk/src/server/game-room.ts` — membership, serialized operations, persistence and idempotency.
 6. `sdk/src/game/Nightwatch.tsx` — React screens, controlled forms and the SDK live subscription protocol.
 
+## Collaborative board implementation
+
+Read `sdk/src/game/Caseboard.tsx`, `sdk/src/game/caseboard-model.ts` and `sdk/src/server/caseboard-actions.ts` together. The browser draws thirteen bounded HTML cards and SVG connections, with local pan/zoom. Pointer movement is transient until drop. The server briefly reserves the dragged card, validates coordinates and per-card revisions, and stores through the existing serialized RecordRoom. Different cards can move concurrently. A connection carries a version for optimistic concurrency; both drag directions refer to the same undirected pair. Undo checks the exact revisions or connection version before restoring prior state, so it cannot erase a partner's newer work. Room revisions prevent slower HTTP refreshes from replacing a newer client snapshot. Older cases without board metadata use deterministic initial positions and unlabeled links display as Possibly related.
+
 ## Likely live-coding changes
 
 - **Add an evidence type:** extend Evidence if needed, add an authored item in the server case, render its classification, and extend tests for valid IDs. Do not put the answer in a client import.

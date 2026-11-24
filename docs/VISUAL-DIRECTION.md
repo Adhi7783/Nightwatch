@@ -17,6 +17,14 @@ The shared background uses an exploded mechanical assembly with independently ro
 
 The renderer uses native WebGL with reusable line buffers and premultiplied additive light. A Canvas 2D renderer projects the same 3D geometry if WebGL is unavailable. No external 3D model download, renderer service or new production dependency is required. Pixel ratio and frame rate are capped for the background, and buffers and contexts are released on unmount.
 
+## Focused investigation workspace
+
+The in-case navigation has three sticky destinations: Investigate, Caseboard and Conclusion. The NIGHTWATCH phase menu handles Mission Control and detective identity. Museum locations lead the investigation screen; interviews, chronology and activity are secondary disclosures. Long-form evidence uses ordinary system text. The existing moving machinery remains across the main screens at the applicant's request.
+
+The caseboard is an original bounded HTML/SVG canvas for ten discoveries and three suspects. Cards begin grouped by museum location, with stable slots as discoveries arrive. Dragging a header arranges a card. Dragging its handle onto a second card opens a Supports, Contradicts or Possibly related editor with an optional explanation. These are working theories and receive no automatic correctness grading. Selection highlights relevant connections and opens full details, review controls and contextual notes. Fit, zoom, Tidy layout and Undo support recovery. Small screens default to a readable list and offer tap-to-connect; card headers also accept keyboard arrows.
+
+Positions save at drop through serialized server actions. A 15-second per-card reservation shows when a partner is dragging. Revision checks reject stale moves, connection versions reject stale edits, and undo refuses to replace newer work. Pan and zoom stay local and partner changes never move another investigator's camera. No additional canvas synchronization backend or graph dependency is needed for thirteen bounded nodes; DeepSpace RecordRoom still owns persistence, access and broadcasts. General drawing, sticky-note tools and generated deductions were deliberately omitted.
+
 ## Navigation and narration
 
 The NIGHTWATCH wordmark opens a native modal dialog covering the viewport. Blur and opacity phase in, followed by large geometric text in rounded translucent boxes. Native dialog behavior provides focus containment; Escape, the close control and the wordmark dismiss it. Selection waits for the exit transition and restores focus. The previous side panel is absent from the rendered UI.
@@ -27,7 +35,7 @@ The compact Replay briefing control plays only the cached voice and does not rep
 
 ## Isolated visual verification
 
-CI also builds sdk/tests/visual-preview into dist/visual-preview. The production publisher only ships dist/client and the Worker; it does not publish this preview. The fixture imports the actual UI components, uses saved public-fiction narration, and has no DeepSpace identity, game endpoint or persistent writes.
+CI also builds sdk/tests/visual-preview into dist/visual-preview. The production publisher only ships dist/client and the Worker; it does not publish this preview. The fixture imports the actual UI components, uses saved public-fiction narration, and has no DeepSpace identity, game endpoint or persistent writes. The ?scene=board fixture uses original demonstration records and the same board domain reducer for local interaction checks; it is separate from the real two-account server regression.
 
 Serve the downloaded CI preview locally with:
 

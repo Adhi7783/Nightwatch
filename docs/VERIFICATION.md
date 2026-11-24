@@ -4,37 +4,35 @@ Production: https://nightwatch-meridian.app.space
 
 Repository: https://github.com/Adhi7783/Nightwatch
 
-Runtime source: 512d51b03bda24d8600ceec4e8f5b0fb13a1e1c6
+Runtime source: eecc4ae3fda33da2e8ad4bbbd8f960f29d0b0284
 
-Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/45141392587
+Successful CI: https://github.com/Adhi7783/Nightwatch/actions/runs/45311139084
 
-Production release: rel_01M83SGEQGNFSSTM92D2H5F6KB
+Production release: rel_01M85NMKBRPWAZ8XSA2DW44ANF
 
-## Current automated checks
+## Automated game and integration checks
 
-Twenty-five tests passed locally and in CI, alongside strict TypeScript and the production build. Thirteen cover authored case structure and deterministic accusation validation; five validate source-grounded recap parsing; four cover per-case briefing behavior and migration from the old global flag; three cover finite 3D geometry, rotation through depth and perspective projection. CI also builds the isolated visual fixture from the actual UI components.
+31 tests passed locally and in CI: 13 authored-case/rule checks, five source-grounded recap checks, four briefing-history/migration checks, three 3D geometry checks and six board concurrency/validation checks. Strict TypeScript, the production build and the isolated visual fixture build passed.
 
-The complete 42-check native-account game regression passed after the profile-history change. It covers authenticated identity, private membership, room capacity, host start, real RecordRoom sockets and broadcasts, evidence reviews and connections, notes, concurrent writes, request deduplication, malformed and wrong accusations, supported joint and solo solves, full reveals, contribution history, closed-case immutability, source-file protection and sign-out/sign-in restoration.
+All 65 native-account production checks passed after the caseboard server revision. They include real DeepSpace identity, private membership, host start, a real RecordRoom socket snapshot and broadcast, denied direct socket writes, earned evidence, reviews/pins, concurrent notes, idempotency, malformed and incorrect accusations, joint and solo solves, full reveal, preserved history and native sign-out/sign-in restoration. Board checks include member gating, drag reservations, partner exclusion, durable positions, stale-revision rejection, bounded coordinates, concurrent independent moves, annotation persistence, stale connection edits, reversed duplicate rejection, connection removal/restoration, context-specific notes, undo ownership/conflict rejection, increasing room revisions and immutable closed boards. Existing developer fixture accounts were used; the applicant's personal cases were not used for mutation tests.
 
-All 18 integration checks passed. They verify real ElevenLabs MP3 and character alignment, durable voice reuse, room-specific briefing completion, nonmember rejection on completion, a subsequent case remaining unbriefed, earned-evidence recap gates and exact citations, generic paid-proxy blocking, closed-case export gating, actual CloudConvert PDF download and result reuse. The final subsequent changes were rendering, responsive transmission layout and the isolated test fixture; the tested server integration and game logic did not change.
+All 19 integration checks passed. Actual ElevenLabs audio/timing, durable narration reuse, per-case briefing completion, earned-evidence Anthropic citations, generic paid-proxy rejection, private-room gates and actual CloudConvert PDF download/reuse were verified. The exported fixture contains an annotated connection and a note attached to The unbroken seal. Its three PDF pages were rendered with Poppler and visually inspected, including escaped literal HTML, evidence context, the connection explanation and contributor totals. No confidential source text or arbitrary generation prompt is sent by these features.
 
-## Browser and visual checks
+The final subsequent runtime change tightened sticky navigation, reduced phase-menu destinations and clarified archive controls. It did not change the tested server, integration or game rules. The final CI reran all 31 tests and built the published artifact.
 
-The production dashboard and navigation were inspected with the native authenticated profile. The centered Mission Control heading and text-only NIGHTWATCH wordmark use the self-hosted display font. The old image and side drawer are absent from the rendered UI. Both 3D scenes reported native WebGL rendering and advancing frame counts. Perspective rotation and the corrected additive light were inspected visually. Desktop and phone dimensions were checked for horizontal overflow.
+## Browser interaction checks
 
-The native full-screen menu phases over a blurred background, contains large rounded navigation tiles and traps keyboard focus. Escape dismisses it and restores focus. Navigation selection completes after its exit transition. The audio-only Replay briefing button was exercised inside an existing production investigation: audio played while the case title and page stayed in place, and no full-screen transmission appeared.
+The actual Caseboard component was exercised in the isolated CI preview. Observed desktop interactions: card drag and save, drawing a connection handle onto a second card, relationship/explanation save, clicking an exposed line to open its editor, keyboard line selection, label edit, remove/undo, keyboard card movement, Tidy layout and layout undo. At 390 by 844, the list view opened by default; selecting a clue led to its full detail panel; review state, contextual notes and tap-to-connect worked. The measured document width did not exceed the viewport. The moving machinery renderer continued advancing frames.
 
-Automatic approval review rejected the agent's planned creation of a new persistent case in the applicant's production profile because that particular data change was not specifically authorized for verification. The agent did not bypass that rejection. Instead, real case creation and per-case history were checked with the existing developer fixture accounts, and the actual Briefing component was tested through the local isolated preview.
+An existing closed case in the native production browser profile resumed successfully with its old evidence and unlabeled connection intact. The three workspace destinations appeared, the board read legacy links as Possibly related, and archived mutation controls were disabled. No new room, theory, evidence or note was added to the applicant's cases during verification. Final navigation and live screenshot checks are recorded with the release evidence.
 
-The preview has no DeepSpace client, identity, game endpoint or persistent writes. It uses cached fictional narration and the same components and CSS as production. At 390 by 844, the transmission occupied the viewport, its controls stayed within the screen, the transcript followed the current spoken words, and no machinery renderer was mounted on the black briefing page. Actual timed typing, pause/resume, natural audio completion and transition into the case-control fixture were observed. The mobile full-screen navigation fit without horizontal overflow and selected a destination correctly. The cached narration was measured at 28.84 seconds.
-
-The PDF export was previously rendered and visually inspected across all three pages, including proof, chronology, escaped notes, accusations and contributions. This revision did not change report generation. No application secret values were found in the tracked source scan.
+The preview has no DeepSpace client, identity, game endpoint or persistent writes. It complements the real authenticated server checks; it is not a complete authenticated two-browser gameplay run. Its demonstration data does not import the canonical case answer. The production publisher ships only dist/client and the Worker, excluding dist/visual-preview.
 
 ## Scope and limits
 
-- The full two-browser UI acceptance specification in sdk/tests/collab.spec.ts is updated but remains unexecuted. Do not call the isolated component preview a complete authenticated browser game run.
-- Fresh-case creation through the applicant's own browser profile was not exercised after automatic review rejected that action. The corresponding native API checks used actual fixture accounts, not mocked services.
-- No blanket WCAG certification or claim of an actor voice clone is made. Native dialogs, focus restoration, labelled controls, reduced-motion handling and responsive layouts are implemented. WebGL fallback is implemented; the recorded visual sessions used WebGL.
-- The applicant's personally confirmed sign-in/name setup is distinct from agent verification. Their own full partner playthrough, writeup review and portal submission remain their steps.
+- The full two-browser SDK specification in sdk/tests/collab.spec.ts is updated but unexecuted. Multi-user server verification used independent native-account HTTP sessions and a real SDK socket.
+- The applicant personally confirmed production sign-in and detective-name setup. Their own complete partner playthrough, writeup review and portal submission remain personal steps.
+- No blanket accessibility certification or actor voice-clone claim is made. Native dialogs, focus restoration, labeled controls, keyboard alternatives and responsive layouts are implemented. Recorded rendering sessions used WebGL; the Canvas 2D fallback remains implemented.
+- Earlier verification established per-case narration, audio-only replay, full-screen phase navigation and the original rotating 3D geometry. This revision preserves those renderers and the requested moving backgrounds.
 
-See VISUAL-DIRECTION.md for primary research links, geometry and rendering choices, and instructions for the isolated visual fixture. Private credentials, cached narration and downloaded build/test artifacts are ignored by Git.
+Private credentials and downloaded build, narration, PDF and screenshot artifacts remain ignored by Git. The tracked-source secret scan passed. See VISUAL-DIRECTION.md for visual decisions and the isolated preview workflow.

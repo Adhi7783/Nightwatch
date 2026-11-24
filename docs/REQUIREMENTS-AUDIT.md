@@ -4,7 +4,7 @@ The detailed product brief and exercise text supplied on November 19, 2026 are t
 
 ## Final implementation status
 
-The production app is https://nightwatch-meridian.app.space and its source claim was verified as GitHub repository `adhi7783/nightwatch`. The SDK revision has passed GitHub TypeScript/build validation, 25 game, recap, briefing-history and geometry tests, and deployed native-account security/game-flow checks. The applicant confirmed production sign-in and detective-name setup; the saved identity was visible after reload. Signed-in desktop/mobile Mission Control, room creation, invitations and lobby restoration were checked in the browser.
+The production app is https://nightwatch-meridian.app.space and its source claim was verified as GitHub repository `adhi7783/nightwatch`. The SDK revision has passed GitHub TypeScript/build validation, 31 game, caseboard, recap, briefing-history and geometry tests, and deployed native-account security/game-flow checks. The applicant confirmed production sign-in and detective-name setup; the saved identity was visible after reload. Signed-in desktop/mobile Mission Control, room creation, invitations and lobby restoration were checked in the browser.
 
 The original `Nightwatch_Project_Build_Checklist.docx` was located beside the project and its full checklist text was cross-checked against this implementation. The document itself was read, not edited or marked complete on the applicant's behalf.
 
@@ -47,7 +47,7 @@ The main exercise states no minimum integration count; the later helpful bar say
 
 ## Scope deliberately left out
 
-Collaborative Canvas, extra cases, monetization and generated mysteries remain excluded. The requested evidence recap, narrated opening and original mechanical command animation are now implemented. AI never decides whether an accusation is correct.
+A general whiteboard, extra cases, monetization and generated mysteries remain excluded. The November 23 usability revision implements a bounded collaborative evidence canvas with draggable cards, attributed annotated links, contextual notes, mobile list view, conflict checks and undo. All shared state remains in the private case RecordRoom. The moving machinery background is preserved. The requested evidence recap, narrated opening and original mechanical command animation are now implemented. AI never decides whether an accusation is correct.
 
 ## Still requires the applicant
 

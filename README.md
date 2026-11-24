@@ -10,7 +10,7 @@ Nightwatch is an original cooperative detective game built on DeepSpace. One or 
 1. Sign in with GitHub or Google through DeepSpace and choose your detective name.
 2. In Mission Control, create a private room or join using a code/link. Returning accounts can resume their saved rooms.
 3. Each new investigation begins with a short narrated briefing and synchronized typing, or you can explicitly skip it. Resuming that same case does not force the full-screen transmission again. Invite one partner before starting, or start solo. Only the host can start the investigation. Click the centered NIGHTWATCH wordmark to open the full-screen phase navigation. Once inside a case, Replay briefing near the top plays only the voice.
-4. Inspect four museum locations and share discoveries. Review or mark evidence important, connect it to suspects/other evidence, and record working theories in the shared notebook.
+4. Inspect four museum locations and share discoveries. Use Investigate for locations and interviews, Caseboard for draggable shared cards, connections and contextual notes, and Conclusion for the supported accusation. Drag a card header to arrange it or drag its connection handle onto another card. Connections have a relationship and optional explanation. List view and tap-to-connect support smaller screens.
 5. Choose a suspect, method, motive and supporting evidence, then explain the connections. In a two-person case, both investigators submit a matching conclusion with sufficient support.
 6. Ask the shared notebook's evidence assistant to select cited observations from earned clues. A correct theory unlocks the full explanation, evidence reasoning, reconstruction and contribution report, with PDF export. Incorrect theories stay spoiler-safe. Both investigators may instead agree to reveal the answer; that records a revealed case rather than a solved case.
 
@@ -46,6 +46,8 @@ The earlier `spacestest.com` prototype is a separate staging app with a permanen
 
 - `sdk/src/game/types.ts`: typed profiles, rooms, members, evidence, connections and submissions.
 - `sdk/src/game/Nightwatch.tsx`: React UI, controlled forms, native auth and live snapshots.
+- `sdk/src/game/Caseboard.tsx`: bounded pointer-driven evidence canvas, keyboard movement, local camera and mobile list view.
+- `sdk/src/server/caseboard-actions.ts`: drag reservations, revision checks, annotated connections and conflict-safe undo.
 - `sdk/src/game/rules.ts`: small deterministic validation/deduction functions.
 - `sdk/src/server/case.ts`: structured original story and server-only answer. **Contains spoilers.**
 - `sdk/src/server/nightwatch-routes.ts`: verified JWT identity, input boundary and private room routing.
@@ -65,11 +67,11 @@ No credentials, test-account passwords, `.dev.vars`, or session backups belong i
 
 DeepSpace authentication provides persistent identity; RecordRoom provides records and live updates; schemas and verified server routes enforce permissions. In addition, three real DeepSpace catalog integrations support the product: **ElevenLabs** narrates the authored briefing with timing alignment, **Anthropic** selects source-verified observations from shared evidence, and **CloudConvert** exports closed-case reports as PDF. All run through the DeepSpace worker integration proxy. No vendor API keys are stored in the app. AI never judges correctness. See [integration design and limits](docs/INTEGRATIONS.md).
 
-The main tradeoff is one complete authored case and structured saved connections rather than a draggable canvas or generated mysteries. The assistant selects exact source text rather than inventing hints. Extra cases, cursors and achievements remain outside this release. The command interface uses original perspective-projected 3D instrument and machinery geometry, black surfaces, translucent blue light and a self-hosted geometric display font. Reduced-motion preferences disable decorative rotation. See [visual direction and implementation](docs/VISUAL-DIRECTION.md).
+The main tradeoff is one complete authored case and a bounded thirteen-card canvas rather than a general whiteboard or generated mysteries. Card positions, annotated links and undo are validated by the existing RecordRoom; pan and zoom stay local to each investigator. The assistant selects exact source text rather than inventing hints. Extra cases, cursors and achievements remain outside this release. The command interface uses original perspective-projected 3D instrument and machinery geometry, black surfaces, translucent blue light and a self-hosted geometric display font. Reduced-motion preferences disable decorative rotation. See [visual direction and implementation](docs/VISUAL-DIRECTION.md).
 
 ## Verification and submission
 
-GitHub Actions runs 25 game, recap, briefing-history and 3D geometry tests, TypeScript validation and the production build. Live verification covers 42 native game/security checks and 18 integration checks, including actual provider responses and a downloaded PDF. See the checked-in verification record for exact release references and execution limits.
+GitHub Actions runs 31 game, caseboard concurrency, recap, briefing-history and 3D geometry tests, TypeScript validation and the production build. Live verification covers 65 native game/security/board checks and 19 integration checks, including actual provider responses and a downloaded PDF. See the checked-in verification record for exact release references and execution limits.
 
 Browser checks cover native sign-in, the applicant's saved detective name, room creation/invitation, reload restoration, and the signed-in 390 px layout. The full solve/security path was tested through real HTTP and independent WebSocket sessions. The complete two-browser UI acceptance specification is provided in `sdk/tests/collab.spec.ts`; do not claim it ran unless recorded.
 
