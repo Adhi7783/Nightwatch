@@ -12,12 +12,24 @@ export function initialPosition(
   id: string,
   shared: Evidence[],
   suspects: Dossier['suspects'],
+  locations: Dossier['locations'] = [],
 ): BoardPosition {
   const suspect = suspects.findIndex((s) => 'suspect:' + s.id === id)
   const i = suspect >= 0 ? suspect : shared.findIndex((c) => c.id === id)
+  const clue = shared[i]
+  const column = locations.findIndex((l) => l.id === clue?.location)
+  const row =
+    column < 0
+      ? 0
+      : shared.filter((c) => c.location === clue?.location).findIndex((c) => c.id === id)
   return {
-    x: suspect >= 0 ? 1390 : 28 + (Math.max(i, 0) % 5) * 268,
-    y: suspect >= 0 ? 92 + i * 268 : 110 + Math.floor(Math.max(i, 0) / 5) * 240,
+    x: suspect >= 0 ? 1390 : column >= 0 ? 30 + column * 310 : 28 + (Math.max(i, 0) % 5) * 268,
+    y:
+      suspect >= 0
+        ? 92 + i * 268
+        : column >= 0
+          ? 110 + row * 234
+          : 110 + Math.floor(Math.max(i, 0) / 5) * 240,
     revision: 0,
   }
 }

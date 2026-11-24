@@ -131,11 +131,13 @@ export default function Nightwatch() {
   } | null>(null)
   const [reportUrl, setReportUrl] = useState('')
 
-  function acceptGame(next: PublicGame) {
+  function acceptGame(next: PublicGame, expectedCode?: string) {
     setGame((current) =>
-      current?.code === next.code && (current.revision || 0) > (next.revision || 0)
+      expectedCode && current?.code !== expectedCode
         ? current
-        : next,
+        : current?.code === next.code && (current.revision || 0) > (next.revision || 0)
+          ? current
+          : next,
     )
   }
   async function openRoom(code: string, join = false) {
@@ -784,7 +786,7 @@ export default function Nightwatch() {
                           { ...body, requestId: crypto.randomUUID() },
                           game.code,
                         )
-                        acceptGame(next)
+                        acceptGame(next, game.code)
                         return next
                       }}
                     />

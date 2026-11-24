@@ -48,21 +48,21 @@ export function Caseboard({
     [explanation, setExplanation] = useState('')
   const [note, setNote] = useState(''),
     [noteSubject, setNoteSubject] = useState('')
-  const [list, setList] = useState(() => window.matchMedia('(max-width: 760px)').matches)
-  const [view, setView] = useState({ x: 20, y: 20, zoom: 0.65 })
+  const [list, setList] = useState(() => window.matchMedia('(max-width: 1000px)').matches)
+  const [view, setView] = useState({ x: 20, y: 0, zoom: 0.85 })
   const [local, setLocal] = useState<Record<string, { x: number; y: number }>>({})
   const [linePoint, setLinePoint] = useState<{ x: number; y: number } | null>(null)
   const [pending, setPending] = useState(false),
     [message, setMessage] = useState(''),
     [error, setError] = useState('')
   const [clock, setClock] = useState(Date.now())
+  const inspector = useRef<HTMLElement>(null),
+    area = useRef<HTMLDivElement>(null)
   const viewport = useRef<HTMLDivElement>(null),
     drag = useRef<Drag | null>(null)
   const alive = useRef(true),
-    latest = useRef(game),
     viewRef = useRef(view),
     sendRef = useRef(send)
-  latest.current = game
   viewRef.current = view
   sendRef.current = send
   const ids = [...game.shared.map((c) => c.id), ...dossier.suspects.map((s) => 'suspect:' + s.id)]
@@ -70,7 +70,7 @@ export function Caseboard({
     ids.map((id) => [
       id,
       {
-        ...initialPosition(id, game.shared, dossier.suspects),
+        ...initialPosition(id, game.shared, dossier.suspects, dossier.locations),
         ...game.board?.positions[id],
         ...local[id],
       },
@@ -148,10 +148,9 @@ export function Caseboard({
     })
   }
   useEffect(() => {
-    if (list) return
-    const t = requestAnimationFrame(fit)
-    return () => cancelAnimationFrame(t)
-  }, [list])
+    if (window.matchMedia('(max-width: 1000px)').matches && (selected || selectedLink || connect))
+      inspector.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [selected, selectedLink, connect?.source, connect?.target])
   function zoomAt(delta: number, clientX?: number, clientY?: number) {
     const el = viewport.current
     if (!el) return
@@ -194,7 +193,8 @@ export function Caseboard({
     return { x: (x - rect.left - v.x) / v.zoom, y: (y - rect.top - v.y) / v.zoom }
   }
   function clearDrag(d: Drag) {
-    if (drag.current === d) drag.current = null
+    if (drag.current !== d) return
+    drag.current = null
     if (alive.current) {
       setLocal({})
       setLinePoint(null)
@@ -366,8 +366,7 @@ export function Caseboard({
           }}
         >
           <span>
-            {s ? 'SUSPECT' : game.board?.positions[id] ? 'EVIDENCE' : 'INBOX'}{' '}
-            {game.pinned.includes(id) ? ' / ★' : ''}
+            {s ? 'SUSPECT' : 'EVIDENCE'} {game.pinned.includes(id) ? ' / ★' : ''}
           </span>
           <span aria-hidden="true">⠿</span>
         </button>
@@ -429,7 +428,13 @@ export function Caseboard({
           <button
             className="btn ghost small"
             onClick={() => {
-              clearDrag(drag.current || ({ kind: 'pan' } as Drag))
+              const d = drag.current
+              if (d) {
+                d.cancelled = true
+                d.finished = true
+                if (d.kind === 'card') void finishCard(d)
+                else clearDrag(d)
+              }
               setList(!list)
             }}
           >
@@ -480,7 +485,7 @@ export function Caseboard({
                   id: myChange?.id,
                   positions: ids.map((id) => ({
                     id,
-                    ...initialPosition(id, game.shared, dossier.suspects),
+                    ...initialPosition(id, game.shared, dossier.suspects, dossier.locations),
                   })),
                 },
                 () => setMessage('Your last board change was undone.'),
@@ -505,7 +510,7 @@ export function Caseboard({
           </button>
         </div>
       )}
-      <div className={'board-workspace' + (list ? ' list-mode' : '')}>
+      <div ref={area} className={'board-workspace' + (list ? ' list-mode' : '')}>
         {list ? (
           <div className="board-card-list">
             <h2>Evidence inbox & suspects</h2>
@@ -574,9 +579,11 @@ export function Caseboard({
                 transform: `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`,
               }}
             >
-              <span className="board-zone" style={{ left: 28, top: 32 }}>
-                EVIDENCE INBOX / YOUR WORKING LAYOUT
-              </span>
+              {dossier.locations.map((l, i) => (
+                <span className="board-zone" key={l.id} style={{ left: 30 + i * 310, top: 32 }}>
+                  {l.name}
+                </span>
+              ))}
               <span className="board-zone" style={{ left: 1390, top: 32 }}>
                 SUSPECTS
               </span>
@@ -650,7 +657,17 @@ export function Caseboard({
             </span>
           </div>
         )}
-        <aside className="board-inspector" aria-label="Selected evidence and connections">
+        <aside
+          ref={inspector}
+          className="board-inspector"
+          aria-label="Selected evidence and connections"
+        >
+          <button
+            className="text-btn back-to-cards"
+            onClick={() => area.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          >
+            ↑ Back to cards
+          </button>
           {connect || link ? (
             <>
               <span className="eyebrow">INVESTIGATOR THEORY</span>

@@ -2,6 +2,7 @@ import { apiWorkerFetch } from 'deepspace/worker'
 import type { Env } from '../../worker'
 import type { Profile, PublicGame } from '../game/types'
 import { verifiedRecap } from './verified-recap'
+import { suspects } from './case'
 
 // Fixed, hand-authored narration. Neither the solution nor the user's text is sent to TTS.
 export const openingBrief =
@@ -183,11 +184,42 @@ export async function feature(
             (c) => '<article><b>' + escape(c.title) + '</b><p>' + escape(c.body) + '</p></article>',
           )
           .join('') +
+        '<h2>Investigator connections</h2>' +
+        (g.links
+          .map((l) => {
+            const name = (id: string) =>
+              g.shared.find((c) => c.id === id)?.title ||
+              suspects.find((s) => 'suspect:' + s.id === id)?.name ||
+              id
+            return (
+              '<p><b>' +
+              escape(name(l.source)) +
+              '</b> / ' +
+              escape(l.relationship || 'related') +
+              ' / <b>' +
+              escape(name(l.target)) +
+              '</b><br>' +
+              escape(l.explanation || '') +
+              '<br><small>By ' +
+              escape(l.by) +
+              '. Working theory recorded by investigators.</small></p>'
+            )
+          })
+          .join('') || '<p>No saved connections.</p>') +
         '<h2>Investigator notebook</h2>' +
         (g.notes
           .map(
             (n) =>
               '<blockquote>' +
+              (n.subject
+                ? '<b>' +
+                  escape(
+                    g.shared.find((c) => c.id === n.subject)?.title ||
+                      suspects.find((s) => 'suspect:' + s.id === n.subject)?.name ||
+                      'Case note',
+                  ) +
+                  '</b><br>'
+                : '') +
               escape(n.text) +
               '<br><small>' +
               escape(g.members.find((m) => m.id === n.by)?.name || n.by || 'Investigator') +

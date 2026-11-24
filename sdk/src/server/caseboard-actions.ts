@@ -88,7 +88,7 @@ export function caseboardAction(
       for (const [id, p] of Object.entries(change.before)) {
         // The UI supplies the deterministic inbox position when no saved position existed.
         const fallback = Array.isArray(b.positions)
-          ? (b.positions as Record<string, unknown>[]).find((x) => x.id === id)
+          ? (b.positions as Record<string, unknown>[]).find((x) => x?.id === id)
           : undefined
         const position = p || fallback
         if (

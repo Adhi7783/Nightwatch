@@ -75,6 +75,7 @@
 .connection-list-item span { display:block; color:#6db3e2; font-size:10px; margin-bottom:4px; }
 .remove-connection { color:#d3a5ae !important; }
 .board-inspector-empty { padding-top:22px; }
+.board-inspector .back-to-cards { display:none; }
 .board-empty { position:absolute; top:280px; left:160px; width:650px; text-align:center; pointer-events:none; color:#82b2d2; }
 .board-empty h2 { font:500 24px/1.6 var(--display); }
 .board-card-list { padding:22px; max-height:650px; overflow-y:auto; display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); align-content:start; }
@@ -86,7 +87,7 @@
 button:focus-visible,summary:focus-visible,.board-edge:focus-visible { outline:2px solid #9edbff; outline-offset:3px; }
 .main :is(p,blockquote,.input,.review-box,.note,.feed,.timeline-item,.suspect p) { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
 @media(min-width:1600px) { .board-viewport,.board-inspector,.board-card-list { height:710px; max-height:710px; } }
-@media(max-width:1000px) { .board-toolbar { align-items:flex-start; flex-direction:column; } .board-workspace { grid-template-columns:minmax(0,1fr) 285px; } }
+@media(max-width:1000px) { .board-toolbar { align-items:flex-start; flex-direction:column; } .board-workspace { grid-template-columns:minmax(0,1fr); } .board-inspector { border-left:0; border-top:1px solid #60a6d52b; max-height:none; height:auto; scroll-margin-top:20px; } .board-inspector .back-to-cards { display:block; } }
 @media(max-width:760px) {
   .investigation-nav { margin:6px 14px; gap:2px; padding:4px; } .investigation-nav button { font-size:12px; gap:7px; min-height:43px; } .nav-step { display:none; }
   .investigation-guide { flex-direction:column; align-items:flex-start; gap:16px; padding:18px; }
