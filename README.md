@@ -1,86 +1,135 @@
-# Nightwatch
+<p align="center">
+  <img src="docs/assets/nightwatch-banner.svg" alt="Nightwatch: a cooperative museum heist investigation" width="100%">
+</p>
 
-**Live:** https://nightwatch-meridian.app.space  
-**Source:** https://github.com/Adhi7783/Nightwatch
+<p align="center">
+  <a href="https://nightwatch-meridian.app.space"><strong>Play Nightwatch</strong></a> ·
+  <a href="docs/FEATURES.md">Gameplay</a> ·
+  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
+  <a href="docs/VERIFICATION.md">Testing</a>
+</p>
 
-Nightwatch is an original cooperative detective game built on DeepSpace. One or two signed-in investigators solve **Case 001: The Midnight Museum Heist** by examining ten evidence files, comparing three suspects, saving connections and notes, and submitting a supported accusation. The solution is deterministic and stays in server-only code until the case closes.
+<p align="center">
+  <a href="https://github.com/Adhi7783/Nightwatch/actions/workflows/ci.yml"><img src="https://github.com/Adhi7783/Nightwatch/actions/workflows/ci.yml/badge.svg" alt="Build and tests"></a>
+  <img src="https://img.shields.io/badge/TypeScript-React-3178C6" alt="TypeScript and React">
+  <img src="https://img.shields.io/badge/Powered_by-DeepSpace-68BFFF" alt="Powered by DeepSpace">
+</p>
 
-## Play
+# Follow the evidence. Build the case.
 
-1. Sign in with GitHub or Google through DeepSpace and choose your detective name.
-2. In Mission Control, create a private room or join using a code/link. Returning accounts can resume their saved rooms.
-3. Each new investigation begins with a short narrated briefing and synchronized typing, or you can explicitly skip it. Resuming that same case does not force the full-screen transmission again. Invite one partner before starting, or start solo. Only the host can start the investigation. Click the centered NIGHTWATCH wordmark to open the full-screen phase navigation. Once inside a case, Replay briefing near the top plays only the voice.
-4. Inspect four museum locations and share discoveries. Use Investigate for locations and interviews, Caseboard for draggable shared cards, connections and contextual notes, and Conclusion for the supported accusation. Drag a card header to arrange it or drag its connection handle onto another card. Connections have a relationship and optional explanation. List view and tap-to-connect support smaller screens.
-5. Choose a suspect, method, motive and supporting evidence, then explain the connections. In a two-person case, both investigators submit a matching conclusion with sufficient support.
-6. Ask the shared notebook's evidence assistant to select cited observations from earned clues. A correct theory unlocks the full explanation, evidence reasoning, reconstruction and contribution report, with PDF export. Incorrect theories stay spoiler-safe. Both investigators may instead agree to reveal the answer; that records a revealed case rather than a solved case.
+Nightwatch is a cooperative detective game for one or two investigators. Enter a private room, explore a museum after a heist, and turn scattered discoveries into a supported explanation.
 
-Profiles belong to the authenticated DeepSpace account rather than a browser-only identity. Progress is persisted through RecordRoom and synchronized through its live subscription protocol.
+The Glass Meridian has vanished from a sealed display at the Bellwether Museum. The lock is intact. Three people have a story. The evidence has another.
+
+**One original, hand-authored mystery. Ten evidence files. Three suspects. A complete reveal.**
+
+## Inside the investigation
+
+- **Persistent detective profiles:** sign in through DeepSpace, choose a name, and return to saved cases.
+- **Private rooms:** investigate solo or invite one partner before the host begins.
+- **A shared caseboard:** drag cards, connect clues to suspects or other evidence, label relationships, and leave contextual notes.
+- **Safe collaboration:** shared layouts persist, camera movement stays personal, and conflict checks protect a partner's newer edits. Undo restores eligible changes.
+- **A narrated opening:** a feminine computer voice introduces each new case with synchronized text. Replay only the voice whenever needed.
+- **Reasoned conclusions:** choose a suspect, method, motive, and supporting evidence. The server validates the accusation. Two investigators must agree.
+- **A lasting case report:** unlock the full explanation, chronology, recovery, and contribution history, then export a PDF.
+- **A holographic command interface:** black surfaces, translucent blue light, original rotating 3D machinery, keyboard alternatives, and a mobile list view.
+
+## How to play
+
+1. [Open Nightwatch](https://nightwatch-meridian.app.space) and sign in with GitHub or Google.
+2. Choose a detective name, then create a private case, resume a save, or join with an invitation.
+3. Hear the briefing. Invite a partner or start solo. Only the host starts the investigation.
+4. Use **Investigate** to explore four museum locations and read suspect accounts. Share discoveries with your room.
+5. Use **Caseboard** to arrange evidence and record connections. Choose Supports, Contradicts, or Possibly related and explain your reasoning.
+6. Use **Conclusion** to submit a supported accusation and read the final report.
+
+Starting a new case asks whether to resume an existing save or create a fresh room. Delete removes an entry from your own archive and offers Undo. Your partner's save and the shared investigation remain intact.
+
+Connections are working theories. The board does not grade every pair or reveal the answer through trial and error. Incorrect accusations remain spoiler-safe. Both investigators can instead agree to reveal the solution and close the case.
+
+## Built with DeepSpace
+
+| Layer | Technology | Purpose |
+| --- | --- | --- |
+| Interface | React, TypeScript, Vite | Investigation screens and interactive evidence canvas |
+| Identity | DeepSpace authentication | Persistent, account-owned detective profiles |
+| Shared state | DeepSpace RecordRoom | Private case records, live subscriptions, and persistence |
+| Server | Hono on Cloudflare Workers | Verified identity, membership, and game rules |
+| Narration | ElevenLabs through DeepSpace | Authored speech and character timing |
+| Evidence assistant | Anthropic through DeepSpace | Source-verified observations from earned evidence |
+| Report export | CloudConvert through DeepSpace | Closed-case HTML to PDF |
+| Visuals | Native WebGL with Canvas 2D fallback | Original instrument and machinery geometry |
+
+The mystery and its solution are authored. AI selects useful excerpts from clues you have earned; it does not invent evidence or judge accusations. Paid features are authenticated, cached, and rate limited. [Read the integration design](docs/INTEGRATIONS.md).
 
 ## Run locally
 
-Use Node 24 and npm 11.6+.
+Use Node 24 and npm 11.6 or newer.
 
 ```sh
-npm run install:app
-npm test
-npm run type-check
 cd sdk
+npm ci
 npx deepspace auth login
 npx deepspace auth whoami
 npx deepspace dev start
 ```
 
-The root scripts delegate app commands to `sdk/`. Its committed `package-lock.json` reproduces the successful CI dependencies; use `npm ci` inside `sdk/` for a clean install.
+From the repository root:
+
+```sh
+npm test
+npm run type-check
+npm run build
+```
+
+Keep the committed lockfile when installing dependencies. The application lives in `sdk/`; root scripts delegate build and development commands there.
 
 ## Deploy
 
-From `sdk/`, use `npx deepspace deploy` under an authorized production developer account. Check `auth whoami` first. Preserve the production app ID `app_01M7VYDJBHE61KDVTRB3DCK6X2`, the BOARD binding, and the v2 room names so saved investigations survive updates.
+Run `npx deepspace deploy` from `sdk/` using an authorized developer account. Preserve the app ID, BOARD binding, and existing room names to retain saved investigations.
 
-The production app's permanent source claim was verified as `github: adhi7783/nightwatch`. Push source to this repository with ordinary Git. Do not use `deepspace push`, which is for DeepSpace-managed source.
+GitHub is this app's canonical source. Push changes with ordinary Git. The checked-in `production-deploy.mjs` can publish a compiled CI artifact using the DeepSpace deployment protocol when local dependency installation is unavailable. Credentials stay local and must never be committed.
 
-Local npm registry connections failed TLS during this build. The official hosted publisher validated the staging SDK candidate, and GitHub Actions installed dependencies, ran TypeScript and rule tests, and built the production artifact. `production-deploy.mjs` then published that artifact using the official CLI's asset-plan/upload/form protocol. Production credentials stayed on the local computer; none were sent to Actions. This transport adaptation is documented rather than claiming that `npx deepspace deploy` ran locally.
+## Architecture and safeguards
 
-The earlier `spacestest.com` prototype is a separate staging app with a permanent DeepSpace source claim. Its config is retained as `sdk/wrangler.staging.toml`. Its legacy browser identities are not silently mapped to native accounts. Never swap staging and production IDs.
+Every game request uses verified platform identity and private room membership. Clients cannot write game records directly. Serialized server actions enforce game phase, host privileges, valid evidence, request deduplication, and deterministic accusations.
 
-## Main files
+Card reservations and per-card revisions protect simultaneous moves. Connection versions protect edits and Undo. The browser keeps each investigator's pan and zoom independent.
 
-- `sdk/src/game/types.ts`: typed profiles, rooms, members, evidence, connections and submissions.
-- `sdk/src/game/Nightwatch.tsx`: React UI, controlled forms, native auth and live snapshots.
-- `sdk/src/game/Caseboard.tsx`: bounded pointer-driven evidence canvas, keyboard movement, local camera and mobile list view.
-- `sdk/src/server/caseboard-actions.ts`: drag reservations, revision checks, annotated connections and conflict-safe undo.
-- `sdk/src/game/rules.ts`: small deterministic validation/deduction functions.
-- `sdk/src/server/case.ts`: structured original story and server-only answer. **Contains spoilers.**
-- `sdk/src/server/nightwatch-routes.ts`: verified JWT identity, input boundary and private room routing.
-- `sdk/src/server/game-room.ts`: DeepSpace RecordRoom storage, membership, host start, serialized actions, request deduplication and durable contribution totals.
-- `sdk/src/lib/lookup-own.ts`: safe own-key and URL validation helpers referenced by the generated scaffold but absent from its published SDK exports. Auth, persistence and synchronization remain platform primitives.
-- `verify-sdk-live.mjs`: deployed security/game-flow checks using three real DeepSpace fixture accounts and an independent WebSocket client.
+The answer is returned only after the case closes. **The server source contains spoilers**, so avoid reading `sdk/src/server/case.ts` before playing. This public repository cannot prevent someone deliberately reading the authored solution.
 
-## Security and concurrency
+## Testing
 
-Private data is in per-room RecordRooms. Verified platform identity and membership gate every HTTP/socket entry. Client schema writes are denied; server actions validate phase, host authority, IDs, lengths, required evidence and request IDs before writing. A serialized room queue prevents concurrent operations from overwriting each other. Request receipts make retries idempotent and reject a reused ID with different input. Unconfigured paid integration proxies are disabled.
+The latest release passed **35 unit tests**, **72 live game and archive checks**, and **20 integration checks**, alongside strict TypeScript and the production build. Browser checks cover the caseboard, mobile interactions, save dialogs, and processed narration playback.
 
-The canonical answer is not imported into browser modules or served as an asset. The source repository includes server code for evaluation; this does not prevent a player deliberately reading repository spoilers. Public file URLs and ordinary gameplay do not disclose the solution before closure.
+The full two-browser UI specification is included but has not been executed. [Verification details and limits](docs/VERIFICATION.md) distinguish server tests from browser checks.
 
-No credentials, test-account passwords, `.dev.vars`, or session backups belong in Git. Private local files are ignored. The SDK's required `users` schema is retained.
+## Explore the code
 
-## Scope and platform choices
+| File | Responsibility |
+| --- | --- |
+| `sdk/src/game/Nightwatch.tsx` | App flow, authentication, and live room snapshots |
+| `sdk/src/game/Caseboard.tsx` | Pointer and keyboard interaction with the evidence canvas |
+| `sdk/src/game/save-archive.ts` | Personal save removal and restoration |
+| `sdk/src/server/game-room.ts` | Serialized private case actions and persistence |
+| `sdk/src/server/caseboard-actions.ts` | Reservations, version checks, links, and Undo |
+| `sdk/src/server/case-services.ts` | Curated narration, recap, and report integrations |
+| `sdk/src/game/rules.ts` | Deterministic accusation validation |
 
-DeepSpace authentication provides persistent identity; RecordRoom provides records and live updates; schemas and verified server routes enforce permissions. In addition, three real DeepSpace catalog integrations support the product: **ElevenLabs** narrates the authored briefing with timing alignment, **Anthropic** selects source-verified observations from shared evidence, and **CloudConvert** exports closed-case reports as PDF. All run through the DeepSpace worker integration proxy. No vendor API keys are stored in the app. AI never judges correctness. See [integration design and limits](docs/INTEGRATIONS.md).
+## About the creator
 
-The main tradeoff is one complete authored case and a bounded thirteen-card canvas rather than a general whiteboard or generated mysteries. Card positions, annotated links and undo are validated by the existing RecordRoom; pan and zoom stay local to each investigator. The assistant selects exact source text rather than inventing hints. Extra cases, cursors and achievements remain outside this release. The command interface uses original perspective-projected 3D instrument and machinery geometry, black surfaces, translucent blue light and a self-hosted geometric display font. Reduced-motion preferences disable decorative rotation. See [visual direction and implementation](docs/VISUAL-DIRECTION.md).
+Hi, I'm **Adhitya**, a computer science student at the **University of Washington Bothell**, based in Seattle. My interests include full-stack development, AI/ML, and interactive experiences that connect thoughtful design with dependable engineering.
 
-## Verification and submission
+With Nightwatch, I wanted the interface to feel like part of the investigation: a place to compare stories, notice contradictions, and build a theory together. The project brings together my interests in games, collaborative software, and AI features with a clear purpose.
 
-GitHub Actions runs 35 game, caseboard concurrency, recap, briefing-history and 3D geometry tests, TypeScript validation and the production build. Live verification covers 72 native game/security/board checks and 20 integration checks, including actual provider responses and a downloaded PDF. See the checked-in verification record for exact release references and execution limits.
+[Find me on GitHub](https://github.com/Adhi7783)
 
-Browser checks cover native sign-in, the applicant's saved detective name, room creation/invitation, reload restoration, and the signed-in 390 px layout. The full solve/security path was tested through real HTTP and independent WebSocket sessions. The complete two-browser UI acceptance specification is provided in `sdk/tests/collab.spec.ts`; do not claim it ran unless recorded.
+## More about Nightwatch
 
-- [Requirement and original checklist audit](docs/REQUIREMENTS-AUDIT.md)
-- [Verification evidence](docs/VERIFICATION.md)
-- [Submission note](docs/SUBMISSION.md)
-- [Applicant's own remaining playtest checklist](docs/APPLICANT-VERIFICATION.md)
-- [Interview preparation and debugging decisions](docs/INTERVIEW.md)
-
-The applicant confirmed production sign-in and detective-name setup. Their full personal partner playthrough and portal submission remain their own steps. The deadline is November 23, 2026, 11:59 PM Eastern / 8:59 PM Pacific.
-
-Starting a private case now asks whether to resume an existing saved room or create a new one. Each archive row has Delete with confirmation and Undo; this removes the personal archive entry without deleting a partner’s save or shared investigation.
+- [Gameplay and features](docs/FEATURES.md)
+- [Product decisions](docs/PRODUCT.md)
+- [Architecture and development](docs/ARCHITECTURE.md)
+- [Integrations and usage limits](docs/INTEGRATIONS.md)
+- [Visual direction](docs/VISUAL-DIRECTION.md)
+- [Verification record](docs/VERIFICATION.md)
+- [Playtesting guide](docs/PLAYTESTING.md)

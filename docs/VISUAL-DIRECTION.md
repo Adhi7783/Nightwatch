@@ -1,6 +1,6 @@
 # Holographic command interface
 
-The November 23 revision follows the applicant's latest references: black surfaces, translucent neon blue type, a text-only NIGHTWATCH wordmark, rotating three-dimensional machinery and a full-screen navigation transition. The previous emblem, subtitle and side drawer are superseded.
+The command interface uses black surfaces, translucent neon blue type, a text-only NIGHTWATCH wordmark, rotating three-dimensional machinery and a full-screen navigation transition. The previous emblem, subtitle and side drawer are superseded.
 
 ## Research and decisions
 
@@ -19,7 +19,7 @@ The renderer uses native WebGL with reusable line buffers and premultiplied addi
 
 ## Focused investigation workspace
 
-The in-case navigation has three sticky destinations: Investigate, Caseboard and Conclusion. The NIGHTWATCH phase menu handles Mission Control and detective identity. Museum locations lead the investigation screen; interviews, chronology and activity are secondary disclosures. Long-form evidence uses ordinary system text. The existing moving machinery remains across the main screens at the applicant's request.
+The in-case navigation has three sticky destinations: Investigate, Caseboard and Conclusion. The NIGHTWATCH phase menu handles Mission Control and detective identity. Museum locations lead the investigation screen; interviews, chronology and activity are secondary disclosures. Long-form evidence uses ordinary system text. The existing moving machinery remains across the main screens as part of the visual direction.
 
 The caseboard is an original bounded HTML/SVG canvas for ten discoveries and three suspects. Cards begin grouped by museum location, with stable slots as discoveries arrive. Dragging a header arranges a card. Dragging its handle onto a second card opens a Supports, Contradicts or Possibly related editor with an optional explanation. These are working theories and receive no automatic correctness grading. Selection highlights relevant connections and opens full details, review controls and contextual notes. Fit, zoom, Tidy layout and Undo support recovery. Small screens default to a readable list and offer tap-to-connect; card headers also accept keyboard arrows.
 

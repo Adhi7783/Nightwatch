@@ -1,26 +1,26 @@
-# Explain and modify Nightwatch
+# Architecture and development
 
 ## Read these files first
 
-1. `sdk/src/game/types.ts` — the profile, room, evidence, links and theory shapes.
-2. `sdk/src/server/case.ts` — the authored case and server-only answer. **Contains spoilers.**
-3. `sdk/src/game/rules.ts` — input validation and deterministic deduction.
-4. `sdk/src/server/nightwatch-routes.ts` — platform JWT verification and room routing.
-5. `sdk/src/server/game-room.ts` — membership, serialized operations, persistence and idempotency.
-6. `sdk/src/game/Nightwatch.tsx` — React screens, controlled forms and the SDK live subscription protocol.
+1. `sdk/src/game/types.ts`  -  the profile, room, evidence, links and theory shapes.
+2. `sdk/src/server/case.ts`  -  the authored case and server-only answer. **Contains spoilers.**
+3. `sdk/src/game/rules.ts`  -  input validation and deterministic deduction.
+4. `sdk/src/server/nightwatch-routes.ts`  -  platform JWT verification and room routing.
+5. `sdk/src/server/game-room.ts`  -  membership, serialized operations, persistence and idempotency.
+6. `sdk/src/game/Nightwatch.tsx`  -  React screens, controlled forms and the SDK live subscription protocol.
 
 ## Collaborative board implementation
 
 Read `sdk/src/game/Caseboard.tsx`, `sdk/src/game/caseboard-model.ts` and `sdk/src/server/caseboard-actions.ts` together. The browser draws thirteen bounded HTML cards and SVG connections, with local pan/zoom. Pointer movement is transient until drop. The server briefly reserves the dragged card, validates coordinates and per-card revisions, and stores through the existing serialized RecordRoom. Different cards can move concurrently. A connection carries a version for optimistic concurrency; both drag directions refer to the same undirected pair. Undo checks the exact revisions or connection version before restoring prior state, so it cannot erase a partner's newer work. Room revisions prevent slower HTTP refreshes from replacing a newer client snapshot. Older cases without board metadata use deterministic initial positions and unlabeled links display as Possibly related.
 
-## Likely live-coding changes
+## Extending the app
 
 - **Add an evidence type:** extend Evidence if needed, add an authored item in the server case, render its classification, and extend tests for valid IDs. Do not put the answer in a client import.
 - **Add another case:** introduce a server case catalog keyed by `caseId`; select it at room creation, then resolve rules from the room's stored ID. Existing rooms keep their case version. Do not edit the meaning of evidence IDs inside an in-progress case.
 - **Duplicate submission:** a request ID is bound to user, action and payload fingerprint. The room serializes operations. A retry returns current state without adding another note/vote; reuse for another payload is rejected. Old receipts are bounded, so explain the retention window honestly.
 - **Concurrent updates:** operations execute through a promise queue inside the same Durable Object. Each loads the latest state, applies one validated change, then persists through RecordRoom. Compare this with stale whole-object writes from clients.
 - **Private room:** verified platform JWT establishes the caller. The worker routes to one room after a membership check. The socket uses `authenticatedRoomRequest`, never a client-provided user ID. Record schemas deny client mutations; server actions enforce game rules.
-- **Hidden solution:** only worker modules import the canonical answer. The client receives the reveal after a solved/revealed state. A source repository can contain server solution code for reviewers; this is not protection against a player deliberately reading the repository.
+- **Hidden solution:** only worker modules import the canonical answer. The client receives the reveal after a solved/revealed state. A source repository can contain server solution code; this is not protection against a player deliberately reading the repository.
 - **Live update failure:** inspect socket status and server rejection; confirm the subscription is to `game` in the correct room, check RecordRoom write acceptance, then compare the second client's snapshot. Test a real note before blaming rendering.
 - **OAuth failure:** separate developer deployment authentication from the app visitor's session. Check the scaffold's auth config/proxy and exact origin; never replace failed OAuth with a custom insecure identity header.
 
@@ -36,10 +36,6 @@ Read `sdk/src/game/Caseboard.tsx`, `sdk/src/game/caseboard-model.ts` and `sdk/sr
 - Sign-out must clear drafts and open clue state as well as room/profile state. The revised auth boundary clears those transient values to avoid carrying a prior investigator's working text into another session.
 - Suspect dossiers should present alibis as claims to investigate, not summarize corroborating footage before a player opens that evidence. Their copy was revised to keep the investigation spoiler-safe while preserving the underlying case logic.
 - A browser keyboard check showed Escape returning focus to the page body after a dialog closed. The dialog now remembers and restores its triggering element on cleanup.
-
-## What the applicant should record
-
-For each real issue you investigate: observed error, hypothesis, smallest test, result, change, and verification. Record your own observations in `docs/APPLICANT-VERIFICATION.md`; do not copy the agent's checks as personal work.
 
 ## Explain the integration tradeoffs
 
