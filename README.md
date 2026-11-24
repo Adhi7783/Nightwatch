@@ -116,14 +116,6 @@ The full two-browser UI specification is included but has not been executed. [Ve
 | `sdk/src/server/case-services.ts` | Curated narration, recap, and report integrations |
 | `sdk/src/game/rules.ts` | Deterministic accusation validation |
 
-## About the creator
-
-Hi, I'm **Adhitya**, a computer science student at the **University of Washington Bothell**, based in Seattle. My interests include full-stack development, AI/ML, and interactive experiences that connect thoughtful design with dependable engineering.
-
-With Nightwatch, I wanted the interface to feel like part of the investigation: a place to compare stories, notice contradictions, and build a theory together. The project brings together my interests in games, collaborative software, and AI features with a clear purpose.
-
-[Find me on GitHub](https://github.com/Adhi7783)
-
 ## More about Nightwatch
 
 - [Gameplay and features](docs/FEATURES.md)
