@@ -6,23 +6,14 @@ import { Hologram } from './Hologram'
 import { Wordmark as Brand, PhaseMenu, type CommandDestination } from './CommandNavigation'
 import { BriefingAudio } from './BriefingAudio'
 import { needsBriefing } from './briefing-state'
+import { Caseboard } from './Caseboard'
 
-type Page =
-  | 'mission'
-  | 'overview'
-  | 'evidence'
-  | 'suspects'
-  | 'notebook'
-  | 'timeline'
-  | 'accusation'
+type Page = 'mission' | 'overview' | 'evidence' | 'accusation'
 const titles: Record<Page, string> = {
   mission: 'Mission Control',
-  overview: 'Case overview',
-  evidence: 'Evidence board',
-  suspects: 'Suspect dossiers',
-  notebook: 'Shared notebook',
-  timeline: 'Timeline',
-  accusation: 'Accusation & report',
+  overview: 'Investigate',
+  evidence: 'Caseboard',
+  accusation: 'Conclusion',
 }
 const when = (at: number) =>
   new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -119,9 +110,7 @@ export default function Nightwatch() {
     [clue, setClue] = useState<Evidence | null>(null)
   const [name, setName] = useState(''),
     [joinCode, setJoinCode] = useState(''),
-    [note, setNote] = useState(''),
-    [source, setSource] = useState(''),
-    [target, setTarget] = useState('')
+    [note, setNote] = useState('')
   const [theory, setTheory] = useState<Theory>({
     suspect: '',
     method: '',
@@ -142,11 +131,18 @@ export default function Nightwatch() {
   } | null>(null)
   const [reportUrl, setReportUrl] = useState('')
 
+  function acceptGame(next: PublicGame) {
+    setGame((current) =>
+      current?.code === next.code && (current.revision || 0) > (next.revision || 0)
+        ? current
+        : next,
+    )
+  }
   async function openRoom(code: string, join = false) {
     setError('')
     const g = await api<PublicGame>(join ? 'join' : 'room', join ? {} : undefined, code)
     const d = await api<Dossier>('dossier', undefined, code)
-    setGame(g)
+    acceptGame(g)
     setDossier(d)
     setPage('overview')
     setRecap(null)
@@ -199,7 +195,7 @@ export default function Nightwatch() {
       refreshing = true
       try {
         const next = await api<PublicGame>('room', undefined, activeCode)
-        if (!cancelled) setGame(next)
+        if (!cancelled) acceptGame(next)
       } catch (e) {
         if (!cancelled) setError((e as Error).message)
       } finally {
@@ -288,7 +284,7 @@ export default function Nightwatch() {
       game.code,
     )
     requestRef.current = null
-    setGame(g)
+    acceptGame(g)
     return g
   }
   function mission() {
@@ -484,7 +480,22 @@ export default function Nightwatch() {
               )}
             </div>
           </header>
-          <main className="main">
+          {game && game.status !== 'waiting' && (
+            <nav className="investigation-nav" aria-label="Investigation workspace">
+              {(['overview', 'evidence', 'accusation'] as const).map((p, i) => (
+                <button
+                  key={p}
+                  aria-current={page === p ? 'page' : undefined}
+                  onClick={() => setPage(p)}
+                >
+                  <span className="nav-step">0{i + 1}</span>
+                  {titles[p]}
+                  {p === 'evidence' && <small>{game.shared.length}/10</small>}
+                </button>
+              ))}
+            </nav>
+          )}
+          <main className={'main' + (page === 'evidence' ? ' main-caseboard' : '')}>
             {error && (
               <div className="notice error-inline" role="alert">
                 {error}
@@ -607,68 +618,91 @@ export default function Nightwatch() {
                           ? 'Completed investigation. Your history is preserved.'
                           : 'Inspect, compare, and connect the evidence.'}
                     </Heading>
-                    <section className={game.status === 'waiting' ? 'case-lobby' : 'panel'}>
-                      <span className="eyebrow">CASE BRIEF</span>
-                      <p>{dossier.brief}</p>
-                      <div className={game.status === 'waiting' ? 'lobby-orbits' : 'actions-row'}>
-                        {game.status === 'waiting' && (
-                          <button
-                            className="btn orbit-button"
-                            disabled={busy || game.hostId !== profile.id}
-                            onClick={() =>
-                              void perform(async () => {
-                                await mutate('start')
-                              })
-                            }
-                          >
-                            <span className="orbit-icon" aria-hidden="true">
-                              ⌾
-                            </span>
-                            <span>
-                              {game.hostId !== profile.id
-                                ? 'Awaiting host'
-                                : game.members.length === 1
-                                  ? 'Start case solo'
-                                  : 'Start investigation'}
-                            </span>
-                            <small>
-                              {game.members.length === 1 ? 'ONE INVESTIGATOR' : 'TEAM READY'}
-                            </small>
-                          </button>
-                        )}
-                        <button
-                          className={
-                            game.status === 'waiting' ? 'btn ghost orbit-button' : 'btn ghost'
-                          }
-                          onClick={() => setModal('invite')}
-                        >
+                    {game.status === 'waiting' && (
+                      <section className="case-lobby">
+                        <span className="eyebrow">CASE BRIEF</span>
+                        <p>{dossier.brief}</p>
+                        <div className={game.status === 'waiting' ? 'lobby-orbits' : 'actions-row'}>
                           {game.status === 'waiting' && (
-                            <span className="orbit-icon" aria-hidden="true">
-                              ◎
-                            </span>
+                            <button
+                              className="btn orbit-button"
+                              disabled={busy || game.hostId !== profile.id}
+                              onClick={() =>
+                                void perform(async () => {
+                                  await mutate('start')
+                                })
+                              }
+                            >
+                              <span className="orbit-icon" aria-hidden="true">
+                                ⌾
+                              </span>
+                              <span>
+                                {game.hostId !== profile.id
+                                  ? 'Awaiting host'
+                                  : game.members.length === 1
+                                    ? 'Start case solo'
+                                    : 'Start investigation'}
+                              </span>
+                              <small>
+                                {game.members.length === 1 ? 'ONE INVESTIGATOR' : 'TEAM READY'}
+                              </small>
+                            </button>
                           )}
-                          <span>Invite / room details</span>
-                          {game.status === 'waiting' && <small>PRIVATE CHANNEL</small>}
-                        </button>
-                        {game.status === 'closed' && (
-                          <button className="btn" onClick={() => setPage('accusation')}>
-                            Read final report
+                          <button
+                            className={
+                              game.status === 'waiting' ? 'btn ghost orbit-button' : 'btn ghost'
+                            }
+                            onClick={() => setModal('invite')}
+                          >
+                            {game.status === 'waiting' && (
+                              <span className="orbit-icon" aria-hidden="true">
+                                ◎
+                              </span>
+                            )}
+                            <span>Invite / room details</span>
+                            {game.status === 'waiting' && <small>PRIVATE CHANNEL</small>}
                           </button>
-                        )}
-                      </div>
-                      <div className="notice">
-                        {game.members.map((m) => (
-                          <div key={m.id}>
-                            {m.name} · {m.id === game.hostId ? 'Host' : 'Partner'} ·{' '}
-                            {m.id === profile.id || Date.now() - m.seen < 65000 ? 'Online' : 'Away'}
-                          </div>
-                        ))}
-                      </div>
-                    </section>
+                        </div>
+                        <div className="notice">
+                          {game.members.map((m) => (
+                            <div key={m.id}>
+                              {m.name} · {m.id === game.hostId ? 'Host' : 'Partner'} ·{' '}
+                              {m.id === profile.id || Date.now() - m.seen < 65000
+                                ? 'Online'
+                                : 'Away'}
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    )}
                     {game.status !== 'waiting' && (
                       <>
+                        <div className="investigation-guide">
+                          <div>
+                            <span className="eyebrow">
+                              {game.status === 'closed' ? 'ARCHIVED CASE' : 'YOUR NEXT STEP'}
+                            </span>
+                            <p>
+                              {game.status === 'closed'
+                                ? 'Explore the preserved evidence or read your complete conclusion.'
+                                : game.shared.length === 0
+                                  ? 'Begin at the Meridian Gallery. Read the files and share discoveries with your partner.'
+                                  : game.shared.length < 10
+                                    ? 'Continue exploring the museum, or compare your discoveries on the caseboard.'
+                                    : 'All ten clues are shared. Compare the sequence and build a supported conclusion.'}
+                            </p>
+                          </div>
+                          <button
+                            className="btn ghost"
+                            onClick={() =>
+                              setPage(game.status === 'closed' ? 'accusation' : 'evidence')
+                            }
+                          >
+                            {game.status === 'closed' ? 'Read final report' : 'Open caseboard'}
+                          </button>
+                        </div>
                         <div className="section-head">
-                          <h2>Investigate the museum</h2>
+                          <h2>Explore the museum</h2>
                           <small>{game.shared.length}/10 shared</small>
                         </div>
                         <section className="location-grid">
@@ -676,7 +710,7 @@ export default function Nightwatch() {
                             <button
                               key={l.id}
                               className="location"
-                              disabled={busy || game.status === 'waiting'}
+                              disabled={busy}
                               onClick={() => void perform(() => inspect(l.id))}
                             >
                               <div className="location-graphic">
@@ -689,10 +723,36 @@ export default function Nightwatch() {
                             </button>
                           ))}
                         </section>
-                        <div className="section-head">
-                          <h2>Latest developments</h2>
-                        </div>
-                        <section className="panel">
+                        <details className="panel workspace-disclosure">
+                          <summary>
+                            Suspect interviews <small>3 dossiers</small>
+                          </summary>
+                          <section className="suspect-grid">
+                            {dossier.suspects.map((s) => (
+                              <article className="suspect" key={s.id}>
+                                <div className="portrait" style={{ background: s.color }}>
+                                  {s.initials}
+                                </div>
+                                <h2>{s.name}</h2>
+                                <p className="job">{s.role}</p>
+                                <p>{s.detail}</p>
+                                <p>
+                                  <strong>Possible motive:</strong> {s.motive}
+                                </p>
+                                <p>
+                                  <strong>Opportunity:</strong> {s.opportunity}
+                                </p>
+                                <p>
+                                  <strong>Alibi:</strong> {s.alibi}
+                                </p>
+                                <blockquote>{s.statement}</blockquote>
+                              </article>
+                            ))}
+                          </section>
+                        </details>
+                        <details className="panel workspace-disclosure">
+                          <summary>Case brief & activity</summary>
+                          <p>{dossier.brief}</p>
                           {game.events
                             .slice(-8)
                             .reverse()
@@ -702,208 +762,43 @@ export default function Nightwatch() {
                                 <time>{when(e.at)}</time>
                               </div>
                             ))}
-                        </section>
+                        </details>
                       </>
                     )}
                   </>
                 )}
                 {page === 'evidence' && (
                   <>
-                    <Heading title="Build the case.">
-                      Review clues and save connections to suspects or other evidence.
+                    <Heading title="Connect the night.">
+                      Arrange the discoveries. Follow the contradictions. Build your explanation.
                     </Heading>
-                    {game.shared.length ? (
-                      <>
-                        <section className="evidence-grid">
-                          {game.shared.map((c) => (
-                            <article className="evidence-card" key={c.id}>
-                              <span className="eyebrow">{c.kind}</span>
-                              <h3>{c.title}</h3>
-                              <p>{c.inference}</p>
-                              <button
-                                className="btn ghost small"
-                                onClick={() => {
-                                  setLocationClues([])
-                                  setClue(c)
-                                }}
-                              >
-                                Read evidence
-                              </button>
-                              <label className="review-box">
-                                <input
-                                  type="checkbox"
-                                  checked={game.reviewed[profile.id]?.includes(c.id) || false}
-                                  disabled={locked}
-                                  onChange={(e) =>
-                                    void perform(async () => {
-                                      await mutate('review', {
-                                        id: c.id,
-                                        reviewed: e.target.checked,
-                                      })
-                                    })
-                                  }
-                                />
-                                <span>Reviewed by me</span>
-                              </label>
-                              <small className="muted">
-                                Reviewed by{' '}
-                                {game.members
-                                  .filter((m) => game.reviewed[m.id]?.includes(c.id))
-                                  .map((m) => m.name)
-                                  .join(', ') || 'no investigators yet'}
-                              </small>
-                              <button
-                                className="text-btn"
-                                disabled={locked}
-                                onClick={() =>
-                                  void perform(async () => {
-                                    await mutate('pin', { id: c.id })
-                                  })
-                                }
-                              >
-                                {game.pinned.includes(c.id) ? 'Unmark important' : 'Mark important'}
-                              </button>
-                            </article>
-                          ))}
-                        </section>
-                        <section className="panel" style={{ marginTop: 25 }}>
-                          <h2 className="panel-title">Evidence connections</h2>
-                          <form
-                            className="form-grid"
-                            onSubmit={(e) =>
-                              submit(e, async () => {
-                                await mutate('link', { source, target })
-                              })
-                            }
-                          >
-                            <label>
-                              From evidence
-                              <select
-                                className="input"
-                                value={source}
-                                onChange={(e) => setSource(e.target.value)}
-                                required
-                              >
-                                <option value="">Choose a clue</option>
-                                {game.shared.map((c) => (
-                                  <option key={c.id} value={c.id}>
-                                    {c.title}
-                                  </option>
-                                ))}
-                              </select>
-                            </label>
-                            <label>
-                              Connect to
-                              <select
-                                className="input"
-                                value={target}
-                                onChange={(e) => setTarget(e.target.value)}
-                                required
-                              >
-                                <option value="">Choose evidence or a suspect</option>
-                                {dossier.suspects.map((s) => (
-                                  <option key={s.id} value={'suspect:' + s.id}>
-                                    Suspect: {s.name}
-                                  </option>
-                                ))}
-                                {game.shared
-                                  .filter((c) => c.id !== source)
-                                  .map((c) => (
-                                    <option key={c.id} value={c.id}>
-                                      {c.title}
-                                    </option>
-                                  ))}
-                              </select>
-                            </label>
-                            <button className="btn" disabled={locked}>
-                              Save connection
-                            </button>
-                          </form>
-                          {game.links.map((l) => (
-                            <div className="linked-row" key={l.id}>
-                              <strong>{game.shared.find((c) => c.id === l.source)?.title}</strong> ·
-                              connected to{' '}
-                              <strong>
-                                {l.target.startsWith('suspect:')
-                                  ? dossier.suspects.find((s) => 'suspect:' + s.id === l.target)
-                                      ?.name
-                                  : game.shared.find((c) => c.id === l.target)?.title}
-                              </strong>
-                              <br />
-                              <small className="muted">
-                                By {l.by} · {when(l.at)}
-                              </small>
-                              <br />
-                              <button
-                                className="text-btn"
-                                disabled={locked}
-                                onClick={() =>
-                                  void perform(async () => {
-                                    await mutate('unlink', { id: l.id })
-                                  })
-                                }
-                              >
-                                Remove connection
-                              </button>
-                            </div>
-                          ))}
-                          {!game.links.length && (
-                            <p className="muted">
-                              No connections yet. Link a discovery to the person or evidence it
-                              helps explain.
-                            </p>
-                          )}
-                        </section>
-                      </>
-                    ) : (
-                      <section className="empty">
-                        <h2>Find your first lead.</h2>
-                        <p>Inspect a museum location and share the evidence you discover.</p>
-                        <button className="btn" onClick={() => setPage('overview')}>
-                          Inspect locations
-                        </button>
-                      </section>
-                    )}
+                    <Caseboard
+                      key={game.code}
+                      game={game}
+                      dossier={dossier}
+                      userId={profile.id}
+                      locked={locked}
+                      send={async (action, body = {}) => {
+                        const next = await api<PublicGame>(
+                          action,
+                          { ...body, requestId: crypto.randomUUID() },
+                          game.code,
+                        )
+                        acceptGame(next)
+                        return next
+                      }}
+                    />
                   </>
                 )}
-                {page === 'suspects' && (
-                  <>
-                    <Heading title="Three stories. One truth.">
-                      Compare statements against the evidence; a motive alone is not proof.
-                    </Heading>
-                    <section className="suspect-grid">
-                      {dossier.suspects.map((s) => (
-                        <article className="suspect" key={s.id}>
-                          <div className="portrait" style={{ background: s.color }}>
-                            {s.initials}
-                          </div>
-                          <h2>{s.name}</h2>
-                          <p className="job">{s.role}</p>
-                          <p>{s.detail}</p>
-                          <p>
-                            <strong>Possible motive:</strong> {s.motive}
-                          </p>
-                          <p>
-                            <strong>Opportunity:</strong> {s.opportunity}
-                          </p>
-                          <p>
-                            <strong>Alibi:</strong> {s.alibi}
-                          </p>
-                          <blockquote>{s.statement}</blockquote>
-                        </article>
-                      ))}
-                    </section>
-                  </>
-                )}
-                {page === 'notebook' && (
-                  <>
-                    <Heading title="Your working theory.">
-                      Notes persist and appear for both investigators without refreshing.
-                    </Heading>
+                {page === 'evidence' && (
+                  <details className="panel workspace-disclosure">
+                    <summary>
+                      Case notes & evidence assistant <small>{game.notes.length} saved notes</small>
+                    </summary>
                     <section className="panel intelligence-panel">
                       <div className="section-head">
                         <div>
-                          <span className="eyebrow">ANTHROPIC / EVIDENCE ASSISTANT</span>
+                          <span className="eyebrow">EVIDENCE ASSISTANT</span>
                           <h2>Focus the investigation.</h2>
                         </div>
                         <button
@@ -987,14 +882,15 @@ export default function Nightwatch() {
                         </p>
                       )}
                     </section>
-                  </>
+                  </details>
                 )}
-                {page === 'timeline' && (
-                  <>
-                    <Heading title="Put the night in order.">
-                      Evidence times indicate when investigators collected a file. The file
-                      describes the underlying events.
-                    </Heading>
+                {page === 'overview' && game.status !== 'waiting' && (
+                  <details className="panel workspace-disclosure">
+                    <summary>Timeline & collected files</summary>
+                    <p className="muted">
+                      Evidence times show when files were collected. Each file describes the
+                      underlying events.
+                    </p>
                     <section className="timeline">
                       {[
                         {
@@ -1029,7 +925,7 @@ export default function Nightwatch() {
                           </article>
                         ))}
                     </section>
-                  </>
+                  </details>
                 )}
                 {page === 'accusation' &&
                   (game.reveal ? (
@@ -1041,7 +937,7 @@ export default function Nightwatch() {
                       </Heading>
                       <section className="panel report-export">
                         <div>
-                          <span className="eyebrow">CLOUDCONVERT / CASE ARCHIVE</span>
+                          <span className="eyebrow">CASE ARCHIVE</span>
                           <p>Take your complete findings, evidence and notebook with you.</p>
                         </div>
                         <button
@@ -1413,6 +1309,17 @@ export default function Nightwatch() {
               ? 'Shared on the board'
               : 'Share with the investigation'}
           </button>
+          {game.shared.some((c) => c.id === clue.id) && (
+            <button
+              className="btn ghost"
+              onClick={() => {
+                setClue(null)
+                setPage('evidence')
+              }}
+            >
+              View caseboard
+            </button>
+          )}
           {error && (
             <p role="alert" className="error-inline">
               {error}

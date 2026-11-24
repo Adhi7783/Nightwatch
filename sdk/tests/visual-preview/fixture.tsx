@@ -1,5 +1,6 @@
 // Isolated visual fixture: no DeepSpace client, identity, game API or persistent writes.
 import { useState } from 'react'
+import { BoardFixture } from './BoardFixture'
 import { createRoot } from 'react-dom/client'
 import { Briefing, Machinery, type Speech } from '../../src/game/CommandVisuals'
 import { BriefingAudio } from '../../src/game/BriefingAudio'
@@ -14,6 +15,7 @@ async function load() {
 function Fixture() {
   const [mode, setMode] = useState(new URL(location.href).searchParams.get('scene') || 'briefing')
   const [menu, setMenu] = useState(false)
+  if (mode === 'board') return <BoardFixture />
   if (mode === 'briefing') return <Briefing load={load} complete={async () => setMode('case')} />
   return <><Machinery /><header className="command-header"><span className="header-system">LOCAL VISUAL FIXTURE</span><Wordmark onClick={() => setMenu(true)} expanded={menu} /></header>
     {menu && <PhaseMenu onClose={() => setMenu(false)} items={['Case overview', 'Evidence board', 'Suspect dossiers', 'Shared notebook', 'Timeline', 'Accusation & report'].map(title => ({id:title,title,detail:'LOCAL FIXTURE / NO SAVED DATA',action:() => setMode(title)}))} />}

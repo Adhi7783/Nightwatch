@@ -5,7 +5,7 @@
     "install:app": "npm --prefix sdk install",
     "dev": "npm --prefix sdk run dev",
     "build": "npm --prefix sdk run build",
-    "test": "node --experimental-strip-types --test sdk/tests/rules.test.ts sdk/tests/recap.test.ts sdk/tests/briefing.test.ts sdk/tests/hologram.test.ts",
+    "test": "node --experimental-strip-types --test sdk/tests/rules.test.ts sdk/tests/recap.test.ts sdk/tests/briefing.test.ts sdk/tests/hologram.test.ts sdk/tests/caseboard.test.ts",
     "type-check": "npm --prefix sdk run type-check"
   }
 }

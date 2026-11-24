@@ -5,6 +5,7 @@ import type { Game, Profile, PublicGame, Member, Theory } from '../game/types'
 import { validateTheory, matchesSolution, sameConclusion } from '../game/rules'
 import { clues, suspects, locations, methods, motives, answer, reveal } from './case'
 import { briefingHistory } from '../game/briefing-state'
+import { caseboardAction } from './caseboard-actions'
 
 const deny = { read: false, create: false, update: false, delete: false }
 const admin = { read: true, create: true, update: true, delete: true }
@@ -82,6 +83,7 @@ export class Board extends RecordRoom<Env> {
     }
   }
   private async put(collection: string, id: string, payload: unknown) {
+    if (collection === 'game') (payload as Game).revision = ((payload as Game).revision || 0) + 1
     await this.record('create', collection, { recordId: id, data: { payload } })
   }
   async fetch(request: Request): Promise<Response> {
@@ -278,40 +280,42 @@ export class Board extends RecordRoom<Env> {
         g.pinned = g.pinned.includes(b.id!)
           ? g.pinned.filter((id) => id !== b.id)
           : [...g.pinned, b.id!]
-      } else if (action === 'link') {
-        if (
-          !g.shared.includes(b.source!) ||
-          (!g.shared.includes(b.target!) &&
-            !suspects.some((s) => 'suspect:' + s.id === b.target)) ||
-          b.source === b.target
+      } else if (
+        [
+          'link',
+          'update-link',
+          'unlink',
+          'board-claim',
+          'board-release',
+          'board-layout',
+          'board-undo',
+        ].includes(action)
+      ) {
+        caseboardAction(
+          g,
+          who,
+          action,
+          b,
+          suspects.map((s) => 'suspect:' + s.id),
         )
-          fail(400, 'Connect shared evidence to another clue or a suspect.')
-        if (g.links.length >= 60) fail(409, 'The board has reached its connection limit.')
-        if (g.links.some((l) => l.source === b.source && l.target === b.target))
-          fail(409, 'That connection already exists.')
-        g.links.push({
-          id: random(),
-          source: b.source!,
-          target: b.target!,
-          by: who.name,
-          at: Date.now(),
-        })
-        contribution.links++
-        g.events.push({
-          text: who.name + ' connected evidence.',
-          by: who.id,
-          kind: 'link',
-          at: Date.now(),
-        })
-      } else if (action === 'unlink') {
-        const link = g.links.find((l) => l.id === b.id)
-        if (!link) fail(404, 'Connection not found.')
-        g.links = g.links.filter((l) => l.id !== b.id)
       } else if (action === 'note') {
         if (typeof b.text !== 'string' || !b.text.trim() || b.text.length > 500)
           fail(400, 'Write a note of 1–500 characters.')
         if (g.notes.length >= 100) fail(409, 'The notebook is full.')
-        g.notes.push({ id: random(), by: who.name, text: b.text.trim(), at: Date.now() })
+        if (
+          b.subject !== undefined &&
+          (typeof b.subject !== 'string' ||
+            (!g.shared.includes(b.subject) &&
+              !suspects.some((s) => 'suspect:' + s.id === b.subject)))
+        )
+          fail(400, 'Attach notes to shared evidence or a suspect.')
+        g.notes.push({
+          id: random(),
+          by: who.name,
+          text: b.text.trim(),
+          at: Date.now(),
+          ...(b.subject ? { subject: String(b.subject) } : {}),
+        })
         contribution.notes++
         g.events.push({
           text: who.name + ' added a case note.',
