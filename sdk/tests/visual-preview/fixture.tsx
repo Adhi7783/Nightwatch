@@ -1,6 +1,8 @@
 // Isolated visual fixture: no DeepSpace client, identity, game API or persistent writes.
 import { useState } from 'react'
 import { BoardFixture } from './BoardFixture'
+import { prepareSpeech } from '../../src/game/computer-voice'
+import { SaveFixture } from './SaveFixture'
 import { createRoot } from 'react-dom/client'
 import { Briefing, Machinery, type Speech } from '../../src/game/CommandVisuals'
 import { BriefingAudio } from '../../src/game/BriefingAudio'
@@ -10,11 +12,12 @@ import { Wordmark, PhaseMenu } from '../../src/game/CommandNavigation'
 async function load() {
   const r = await fetch('/briefing-fixture.json')
   if (!r.ok) throw Error('The local narration fixture is missing.')
-  return r.json() as Promise<Speech>
+  return prepareSpeech(await r.json() as Speech)
 }
 function Fixture() {
   const [mode, setMode] = useState(new URL(location.href).searchParams.get('scene') || 'briefing')
   const [menu, setMenu] = useState(false)
+  if (mode === 'saves') return <SaveFixture />
   if (mode === 'board') return <BoardFixture />
   if (mode === 'briefing') return <Briefing load={load} complete={async () => setMode('case')} />
   return <><Machinery /><header className="command-header"><span className="header-system">LOCAL VISUAL FIXTURE</span><Wordmark onClick={() => setMenu(true)} expanded={menu} /></header>

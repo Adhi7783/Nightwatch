@@ -20,6 +20,7 @@ test('two signed-in investigators share reviews, notes, and evidence connections
     }
   }
   await host.page.getByRole('button', { name: 'Start a private case', exact: true }).click()
+  await host.page.getByRole('button', { name: 'New case', exact: true }).click()
   await host.page.getByRole('button', { name: 'Skip briefing and continue' }).click()
   await host.page.getByRole('button', { name: /Invite \/ room details/ }).click()
   const code = (await host.page.locator('.code-display').innerText()).replaceAll('–', '')

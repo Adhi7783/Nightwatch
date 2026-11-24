@@ -34,6 +34,8 @@ check('Nonmembers cannot export reports', (await api(outsider, 'report', {}, cod
 const narration = await api(host, 'briefing', {})
 if (narration.status !== 200) throw Error(JSON.stringify({ feature: 'briefing', ...narration }))
 check('ElevenLabs returns actual audio and character timing', narration.data.audioUrl.startsWith('data:audio/') && narration.data.alignment.characters.length > 100 && narration.data.alignment.character_start_times_seconds.every(Number.isFinite))
+check('Briefing uses the feminine computer voice and processing preset', narration.data.voice === 'Sarah, feminine computer voice' && narration.data.effect === 'computer-v1')
+await fs.writeFile('test-artifacts/briefing-fixture.json', JSON.stringify(narration.data))
 await fs.writeFile('test-artifacts/briefing.mp3', Buffer.from(narration.data.audioUrl.split(',')[1], 'base64'))
 check('Narration is reused from the durable cache', (await api(host, 'briefing', {})).data.audioUrl === narration.data.audioUrl)
 check('Nonmembers cannot mark another room briefing complete', (await api(outsider, 'briefing-seen', {}, code)).status === 403)

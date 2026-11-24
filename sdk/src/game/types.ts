@@ -18,6 +18,7 @@ export type Profile = {
   created: number
   briefingSeen?: boolean
   briefedRooms?: string[]
+  deletedRooms?: { code: string; at: number }[]
 }
 export type Theory = {
   suspect: string

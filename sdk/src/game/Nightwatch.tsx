@@ -7,6 +7,8 @@ import { Wordmark as Brand, PhaseMenu, type CommandDestination } from './Command
 import { BriefingAudio } from './BriefingAudio'
 import { needsBriefing } from './briefing-state'
 import { Caseboard } from './Caseboard'
+import { NewCaseChoice, DeleteSaveChoice } from './SaveDialogs'
+import { prepareSpeech } from './computer-voice'
 
 type Page = 'mission' | 'overview' | 'evidence' | 'accusation'
 const titles: Record<Page, string> = {
@@ -41,7 +43,9 @@ async function api<T>(
   const data = (await response.json()) as T & { error?: string }
   if (!response.ok)
     throw Error(data.error || 'The archive could not complete that request. Retry when connected.')
-  return data
+  return action === 'briefing'
+    ? ((await prepareSpeech(data as unknown as Speech)) as unknown as T)
+    : data
 }
 function Modal({
   title,
@@ -106,7 +110,9 @@ export default function Nightwatch() {
     [busy, setBusy] = useState(false),
     [loaded, setLoaded] = useState(false),
     [live, setLive] = useState(false)
-  const [modal, setModal] = useState<'invite' | 'join' | 'profile' | 'reveal' | null>(null),
+  const [modal, setModal] = useState<
+      'invite' | 'join' | 'profile' | 'reveal' | 'new-case' | 'delete-save' | null
+    >(null),
     [clue, setClue] = useState<Evidence | null>(null)
   const [name, setName] = useState(''),
     [joinCode, setJoinCode] = useState(''),
@@ -130,6 +136,24 @@ export default function Nightwatch() {
     evidenceCount: number
   } | null>(null)
   const [reportUrl, setReportUrl] = useState('')
+  const [deleteCode, setDeleteCode] = useState(''),
+    [undoSave, setUndoSave] = useState('')
+  function requestNewCase() {
+    setError('')
+    setModal('new-case')
+  }
+  async function createCase() {
+    const g = await api<PublicGame>('create', {})
+    await openRoom(g.code)
+  }
+  async function changeArchive(code: string, deleted: boolean) {
+    const result = await api<{ profile: Profile }>('archive', { deleted }, code)
+    setProfile(result.profile)
+    setUndoSave(deleted ? code : '')
+    setModal(null)
+    if (deleted && localStorage.getItem('nightwatch-sdk-room') === code)
+      localStorage.removeItem('nightwatch-sdk-room')
+  }
 
   function acceptGame(next: PublicGame, expectedCode?: string) {
     setGame((current) =>
@@ -165,6 +189,8 @@ export default function Nightwatch() {
       setModal(null)
       setClue(null)
       setNote('')
+      setUndoSave('')
+      setDeleteCode('')
       setTheory({ suspect: '', method: '', motive: '', evidence: [], explanation: '' })
       requestRef.current = null
       setLoaded(true)
@@ -325,11 +351,7 @@ export default function Nightwatch() {
         id: 'create',
         title: 'Start a private case',
         detail: 'OPEN AN ORIGINAL MYSTERY',
-        action: () =>
-          void perform(async () => {
-            const g = await api<PublicGame>('create', {})
-            await openRoom(g.code)
-          }),
+        action: requestNewCase,
       },
       {
         id: 'join',
@@ -558,16 +580,7 @@ export default function Nightwatch() {
                     </p>
                     <div className="case-meta">1–2 investigators / 10 clues / 3 suspects</div>
                     <div className="actions-row">
-                      <button
-                        className="btn"
-                        disabled={busy}
-                        onClick={() =>
-                          void perform(async () => {
-                            const g = await api<PublicGame>('create', {})
-                            await openRoom(g.code)
-                          })
-                        }
-                      >
+                      <button className="btn" disabled={busy} onClick={requestNewCase}>
                         Start a private case
                       </button>
                       <button className="btn ghost" onClick={() => setModal('join')}>
@@ -581,6 +594,25 @@ export default function Nightwatch() {
                 </section>
                 <section className="panel">
                   <h2 className="panel-title">Resume an investigation</h2>
+                  {undoSave && (
+                    <div className="notice archive-undo" role="status">
+                      <span>Saved case removed from your archive.</span>
+                      <button
+                        className="text-btn"
+                        disabled={busy}
+                        onClick={() => void perform(() => changeArchive(undoSave, false))}
+                      >
+                        Undo delete
+                      </button>
+                      <button
+                        className="text-btn"
+                        aria-label="Dismiss save notification"
+                        onClick={() => setUndoSave('')}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
                   {profile.rooms.length ? (
                     <div className="room-list">
                       {profile.rooms.map((code) => (
@@ -589,13 +621,27 @@ export default function Nightwatch() {
                             Case 001 · <span className="mono">{codeLabel(code)}</span>
                             {profile.closed.includes(code) ? ' · Closed' : ''}
                           </span>
-                          <button
-                            className="btn ghost small"
-                            disabled={busy}
-                            onClick={() => void perform(() => openRoom(code))}
-                          >
-                            Resume
-                          </button>
+                          <div className="archive-actions">
+                            <button
+                              className="btn ghost small"
+                              disabled={busy}
+                              onClick={() => void perform(() => openRoom(code))}
+                            >
+                              Resume
+                            </button>
+                            <button
+                              className="btn ghost small delete-save"
+                              disabled={busy}
+                              aria-label={'Delete save ' + codeLabel(code)}
+                              onClick={() => {
+                                setError('')
+                                setDeleteCode(code)
+                                setModal('delete-save')
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -1164,6 +1210,36 @@ export default function Nightwatch() {
           </main>
         </div>
       </div>
+      {modal === 'new-case' && profile && (
+        <Modal title="Are you sure you want to start a new case?" onClose={() => setModal(null)}>
+          <NewCaseChoice
+            profile={profile}
+            busy={busy}
+            onResume={(code) => void perform(() => openRoom(code))}
+            onCreate={() => void perform(createCase)}
+          />
+          {error && (
+            <p className="error-inline" role="alert">
+              {error}
+            </p>
+          )}
+        </Modal>
+      )}
+      {modal === 'delete-save' && (
+        <Modal title="Delete this saved case?" onClose={() => setModal(null)}>
+          <DeleteSaveChoice
+            code={deleteCode}
+            busy={busy}
+            onCancel={() => setModal(null)}
+            onDelete={() => void perform(() => changeArchive(deleteCode, true))}
+          />
+          {error && (
+            <p className="error-inline" role="alert">
+              {error}
+            </p>
+          )}
+        </Modal>
+      )}
       {modal === 'join' && (
         <Modal title="Join a private investigation." onClose={() => setModal(null)}>
           <form

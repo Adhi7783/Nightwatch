@@ -15,6 +15,8 @@ export function Machinery() {
 }
 
 export type Speech = {
+  effect?: 'computer-v1'
+  voice?: string
   text: string
   audioUrl: string
   alignment: {

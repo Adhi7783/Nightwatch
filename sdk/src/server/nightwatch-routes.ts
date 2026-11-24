@@ -67,6 +67,8 @@ export function registerNightwatchRoutes(app: Hono<AppContext>) {
       .toUpperCase()
     if (!/^[A-F0-9]{12}$/.test(code))
       return c.json({ error: 'Use the 12-character invitation code.' }, 400)
+    if (action === 'archive' && req.method === 'POST')
+      return internal(global, 'archive', { who: profile, code, deleted: body.deleted })
     const room = c.env.BOARD.get(c.env.BOARD.idFromName('nightwatch:v2:room:' + code))
     if (action === 'briefing-seen' && req.method === 'POST') {
       const gate = await internal(room, 'room', { who: profile })

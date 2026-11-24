@@ -76,7 +76,7 @@ export async function feature(
       )
     const key =
       name === 'briefing'
-        ? 'briefing:v3'
+        ? 'briefing:v4:sarah-computer'
         : name +
           (name === 'report' ? ':v4:' : ':v3:') +
           game!.code +
@@ -88,13 +88,13 @@ export async function feature(
     if (name === 'briefing') {
       const speech = await call(env, 'elevenlabs/generate-speech-with-timestamps', {
         text: openingBrief,
-        voice_id: 'JBFqnCBsd6RMkjVDRZzb',
+        voice_id: 'EXAVITQu4vr4xnSDxMaL',
         model_id: 'eleven_multilingual_v2',
         output_format: 'mp3_22050_32',
         voice_settings: {
-          stability: 0.7,
+          stability: 0.94,
           similarity_boost: 0.75,
-          style: 0.1,
+          style: 0,
           use_speaker_boost: true,
         },
       })
@@ -111,7 +111,8 @@ export async function feature(
         audioUrl: speech.audioUrl,
         alignment,
         provider: 'ElevenLabs',
-        voice: 'George, British narrator',
+        voice: 'Sarah, feminine computer voice',
+        effect: 'computer-v1',
       }
     } else if (name === 'recap') {
       // Deliberately give Claude only earned, shared evidence. Require verbatim

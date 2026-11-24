@@ -99,6 +99,15 @@ try{
  check('Closed caseboard preserves positions and relationships',solved.data.board.positions.seal.x===200&&solved.data.links.find(x=>x.id===l.id).relationship==='contradicts');
  check('Closed caseboard rejects moves',(await api(a,'board-layout',{positions:[{id:'seal',x:300,y:180,revision:3}]},code)).status===409);
  check('Closed case history survives a fresh request',(await api(a,'room',undefined,code)).data.reveal.culprit==='Mara Voss');
+ check('Outsiders cannot remove another detective’s saved case',(await api(c,'archive',{deleted:true},code)).status===404);
+ const removed=await api(a,'archive',{deleted:true},code);
+ check('Delete removes only the caller’s archive entry',removed.status===200&&!removed.data.profile.rooms.includes(code));
+ check('Partner’s save survives another detective’s deletion',(await api(b,'profile')).data.profile.rooms.includes(code));
+ check('Shared case history survives archive deletion',(await api(b,'room',undefined,code)).data.reveal.culprit==='Mara Voss');
+ check('Repeated archive deletion is idempotent',(await api(a,'archive',{deleted:true},code)).data.profile.deletedRooms.filter(r=>r.code===code).length===1);
+ const restoredSave=await api(a,'archive',{deleted:false},code);
+ check('Undo restores the saved case without losing completion',restoredSave.status===200&&restoredSave.data.profile.rooms.includes(code)&&restoredSave.data.profile.closed.includes(code));
+ check('Archive actions reject invalid deletion values',(await api(a,'archive',{deleted:'yes'},code)).status===400);
  check('Solved case cannot be modified',(await api(a,'note',{text:'after closure'},code)).status===409);
  check('Account case history records completion',(await api(a,'profile')).data.profile.closed.includes(code));
  const solo=(await api(a,'create',{})).data.code;await api(a,'start',{},solo);for(const id of right.evidence)await api(a,'share',{id},solo);check('One investigator can solve a solo case',(await api(a,'accuse',right,solo)).data.status==='closed');
